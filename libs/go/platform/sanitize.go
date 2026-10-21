@@ -20,7 +20,15 @@ func Sanitize(v any, secrets []string) any {
 			for k, v := range x {
 				_, flag := v.(bool)
 				if (Sensitive(k) && !(k == "secret" && flag)) || ((secret || kind == "api_key") && k == "value") || (k == "expected" && Sensitive(path)) {
-					x[k] = "***"
+					// Response headers retain their []string shape after redaction.
+					if values, ok := v.([]any); ok {
+						for i := range values {
+							values[i] = "***"
+						}
+						x[k] = values
+					} else {
+						x[k] = "***"
+					}
 				} else {
 					x[k] = walk(v)
 				}

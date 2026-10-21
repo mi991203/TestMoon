@@ -118,7 +118,7 @@ func (a *Agent) call(ctx context.Context, op string, in, out proto.Message) erro
 	}
 	res, e := a.HTTP.Do(req)
 	if e != nil {
-		return errors.New("Runner control-plane connection failed")
+		return fmt.Errorf("Runner %s control-plane connection failed: %w", op, e)
 	}
 	defer res.Body.Close()
 	body, e := io.ReadAll(io.LimitReader(res.Body, 12<<20))
@@ -185,7 +185,7 @@ func (a *Agent) Run(ctx context.Context) {
 			completeCtx, c := context.WithTimeout(context.Background(), 10*time.Second)
 			defer c()
 			if e := a.report(completeCtx, "complete", j, result); e != nil {
-				logrus.WithField("run_id", j.RunID).Warn("result delivery failed or execution already terminal")
+				logrus.WithError(e).WithField("run_id", j.RunID).Warn("result delivery failed or execution already terminal")
 			}
 			a.mu.Lock()
 			delete(a.active, j.RunID)
@@ -295,7 +295,9 @@ func (a *Agent) execute(ctx context.Context, j job) m.Result {
 				}
 				if time.Since(lastProgress) > time.Second {
 					engine.Compact(&progress)
-					_ = a.report(ctx, "progress", j, progress)
+					if err := a.report(ctx, "progress", j, progress); err != nil {
+						logrus.WithError(err).WithField("run_id", j.RunID).Warn("execution progress delivery failed")
+					}
 					lastProgress = time.Now()
 				}
 			}
@@ -315,7 +317,7 @@ func (a *Agent) execute(ctx context.Context, j job) m.Result {
 func (a *Agent) report(ctx context.Context, op string, j job, result m.Result) error {
 	value := &contracts.ExecutionResult{}
 	if err := transport.Encode(result, value); err != nil {
-		return err
+		return fmt.Errorf("encode execution %s result: %w", op, err)
 	}
 	if op == "progress" {
 		return a.call(ctx, op, &pb.ProgressRunRequest{Id: j.RunID, Lease: j.Lease, Result: value}, &pb.ProgressRunResponse{})

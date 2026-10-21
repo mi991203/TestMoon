@@ -238,14 +238,20 @@ func (e *Engine) Run(ctx context.Context, snapshot m.Snapshot) m.Result {
 				}
 				sr = e.step(ctx, item.ID, step, &state)
 			}
-			statuses = append(statuses, sr.Status)
-			if sr.Status != "passed" && sr.Status != "unverified" && !step.ContinueOnFailure {
+			safe := p.Sanitize(sr, e.Secrets)
+			b, err := json.Marshal(safe)
+			var stored m.StepResult
+			if err == nil {
+				err = json.Unmarshal(b, &stored)
+			}
+			if err != nil {
+				// Return a reportable failure without falling back to unsanitized data.
+				stored = m.StepResult{ID: step.ID, Name: step.Name, Status: "error", Error: "执行结果脱敏转换失败"}
+			}
+			statuses = append(statuses, stored.Status)
+			if stored.Status != "passed" && stored.Status != "unverified" && !step.ContinueOnFailure {
 				stopped = true
 			}
-			safe := p.Sanitize(sr, e.Secrets)
-			b, _ := json.Marshal(safe)
-			var stored m.StepResult
-			_ = json.Unmarshal(b, &stored)
 			trimStep(&stored, 16384)
 			ir.Steps = append(ir.Steps, stored)
 			if e.Event != nil {
