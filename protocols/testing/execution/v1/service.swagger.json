@@ -1,0 +1,1931 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "protocols/testing/execution/v1/service.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Execution"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/execution/v1/cancel": {
+      "post": {
+        "operationId": "Execution_CancelRun",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CancelRunResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CancelRunRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/execution/v1/create-task": {
+      "post": {
+        "operationId": "Execution_CreateTask",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateTaskResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateTaskRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/execution/v1/debug-http": {
+      "post": {
+        "operationId": "Execution_DebugHTTP",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DebugHTTPResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DebugHTTPRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/execution/v1/delete-task": {
+      "post": {
+        "operationId": "Execution_DeleteTask",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteTaskResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DeleteTaskRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/execution/v1/private-runners/create": {
+      "post": {
+        "operationId": "Execution_CreatePrivateRunner",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreatePrivateRunnerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreatePrivateRunnerRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/execution/v1/private-runners/revoke": {
+      "post": {
+        "operationId": "Execution_RevokePrivateRunner",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RevokePrivateRunnerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RevokePrivateRunnerRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/execution/v1/project-runners/list": {
+      "post": {
+        "operationId": "Execution_ListProjectRunners",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListProjectRunnersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ListProjectRunnersRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/execution/v1/public-runners/create": {
+      "post": {
+        "operationId": "Execution_CreatePublicRunner",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreatePublicRunnerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreatePublicRunnerRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/execution/v1/public-runners/list": {
+      "post": {
+        "operationId": "Execution_ListPublicRunners",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListPublicRunnersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ListPublicRunnersRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/execution/v1/public-runners/revoke": {
+      "post": {
+        "operationId": "Execution_RevokePublicRunner",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RevokePublicRunnerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RevokePublicRunnerRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/execution/v1/run": {
+      "post": {
+        "operationId": "Execution_GetRun",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetRunResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetRunRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/execution/v1/run-case": {
+      "post": {
+        "operationId": "Execution_RunCase",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RunCaseResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RunCaseRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/execution/v1/run-scenario": {
+      "post": {
+        "operationId": "Execution_RunScenario",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RunScenarioResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RunScenarioRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/execution/v1/run-task": {
+      "post": {
+        "operationId": "Execution_RunTask",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RunTaskResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RunTaskRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/execution/v1/runs": {
+      "post": {
+        "operationId": "Execution_ListRuns",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListRunsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ListRunsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/execution/v1/tasks": {
+      "post": {
+        "operationId": "Execution_ListTasks",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListTasksResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ListTasksRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/execution/v1/update-task": {
+      "post": {
+        "operationId": "Execution_UpdateTask",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateTaskResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateTaskRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/runner/v1/complete": {
+      "post": {
+        "operationId": "Execution_CompleteRun",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CompleteRunResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CompleteRunRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/runner/v1/heartbeat": {
+      "post": {
+        "operationId": "Execution_RunnerHeartbeat",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RunnerHeartbeatResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RunnerHeartbeatRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/runner/v1/poll": {
+      "post": {
+        "operationId": "Execution_PollRunnerJob",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PollRunnerJobResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1PollRunnerJobRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/runner/v1/progress": {
+      "post": {
+        "operationId": "Execution_ProgressRun",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ProgressRunResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ProgressRunRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    },
+    "/api/runner/v1/register": {
+      "post": {
+        "operationId": "Execution_RegisterRunner",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RegisterRunnerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RegisterRunnerRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Execution"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "Represents a JSON `null`.\n\n`NullValue` is a sentinel, using an enum with only one value to represent\nthe null value for the `Value` type union.\n\nA field of type `NullValue` with any value other than `0` is considered\ninvalid. Most ProtoJSON serializers will emit a `Value` with a `null_value`\nset as a JSON `null` regardless of the integer value, and so will round trip\nto a `0` value.\n\n - NULL_VALUE: Null value."
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Assertion": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "operator": {
+          "type": "string"
+        },
+        "expected": {}
+      }
+    },
+    "v1AssertionResult": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Auth": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "in": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CancelRunRequest": {
+      "type": "object",
+      "properties": {
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CancelRunResponse": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1CompiledItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompiledStep"
+          }
+        },
+        "collectionVariables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1CompiledStep": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "case": {
+          "$ref": "#/definitions/v1TestCaseDefinition"
+        },
+        "continueOnFailure": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1CompleteRunRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "lease": {
+          "type": "string"
+        },
+        "result": {
+          "$ref": "#/definitions/v1ExecutionResult"
+        }
+      }
+    },
+    "v1CompleteRunResponse": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1CreatePrivateRunnerRequest": {
+      "type": "object",
+      "properties": {
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "concurrency": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1CreatePrivateRunnerResponse": {
+      "type": "object",
+      "properties": {
+        "runner": {
+          "$ref": "#/definitions/v1Runner"
+        },
+        "enrollmentToken": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreatePublicRunnerRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "concurrency": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1CreatePublicRunnerResponse": {
+      "type": "object",
+      "properties": {
+        "runner": {
+          "$ref": "#/definitions/v1Runner"
+        },
+        "enrollmentToken": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateTaskRequest": {
+      "type": "object",
+      "properties": {
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "document": {
+          "$ref": "#/definitions/v1TaskDefinition"
+        }
+      }
+    },
+    "v1CreateTaskResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1DebugHTTPRequest": {
+      "type": "object",
+      "properties": {
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "debug": {
+          "$ref": "#/definitions/v1TestCaseDefinition"
+        },
+        "environmentId": {
+          "type": "string"
+        },
+        "runnerId": {
+          "type": "string"
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idempotencyKey": {
+          "type": "string"
+        }
+      }
+    },
+    "v1DebugHTTPResponse": {
+      "type": "object",
+      "properties": {
+        "run": {
+          "$ref": "#/definitions/v1Run"
+        }
+      }
+    },
+    "v1DeleteTaskRequest": {
+      "type": "object",
+      "properties": {
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1DeleteTaskResponse": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1EnvironmentDefinition": {
+      "type": "object",
+      "properties": {
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1Variable"
+          }
+        }
+      }
+    },
+    "v1ExecutionResult": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ItemResult"
+          }
+        },
+        "error": {
+          "type": "string"
+        },
+        "durationMs": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1Extraction": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "variable": {
+          "type": "string"
+        },
+        "secret": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1GetRunRequest": {
+      "type": "object",
+      "properties": {
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetRunResponse": {
+      "type": "object",
+      "properties": {
+        "run": {
+          "$ref": "#/definitions/v1Run"
+        },
+        "result": {
+          "$ref": "#/definitions/v1ExecutionResult"
+        }
+      }
+    },
+    "v1HTTPRequest": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "query": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "bodyType": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "auth": {
+          "$ref": "#/definitions/v1Auth"
+        },
+        "timeoutMs": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1HTTPResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1HeaderValues"
+          }
+        },
+        "body": {
+          "type": "string"
+        },
+        "durationMs": {
+          "type": "string",
+          "format": "int64"
+        },
+        "error": {
+          "type": "string"
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1HeaderValues": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ItemResult": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1StepResult"
+          }
+        }
+      }
+    },
+    "v1ListProjectRunnersRequest": {
+      "type": "object",
+      "properties": {
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListProjectRunnersResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Runner"
+          }
+        }
+      }
+    },
+    "v1ListPublicRunnersRequest": {
+      "type": "object"
+    },
+    "v1ListPublicRunnersResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Runner"
+          }
+        }
+      }
+    },
+    "v1ListRunsRequest": {
+      "type": "object",
+      "properties": {
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListRunsResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Run"
+          }
+        }
+      }
+    },
+    "v1ListTasksRequest": {
+      "type": "object",
+      "properties": {
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListTasksResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Task"
+          }
+        }
+      }
+    },
+    "v1Operation": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "script": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        }
+      }
+    },
+    "v1PollRunnerJobRequest": {
+      "type": "object"
+    },
+    "v1PollRunnerJobResponse": {
+      "type": "object",
+      "properties": {
+        "job": {
+          "$ref": "#/definitions/v1RunnerJob"
+        }
+      }
+    },
+    "v1ProgressRunRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "lease": {
+          "type": "string"
+        },
+        "result": {
+          "$ref": "#/definitions/v1ExecutionResult"
+        }
+      }
+    },
+    "v1ProgressRunResponse": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1RegisterRunnerRequest": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1RegisterRunnerResponse": {
+      "type": "object",
+      "properties": {
+        "runnerId": {
+          "type": "string"
+        },
+        "credential": {
+          "type": "string"
+        },
+        "public": {
+          "type": "boolean"
+        },
+        "concurrency": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1RequestPatch": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "query": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "bodyType": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "auth": {
+          "$ref": "#/definitions/v1Auth"
+        }
+      }
+    },
+    "v1RevokePrivateRunnerRequest": {
+      "type": "object",
+      "properties": {
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1RevokePrivateRunnerResponse": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1RevokePublicRunnerRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1RevokePublicRunnerResponse": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1Run": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "taskId": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "targetRunnerId": {
+          "type": "string"
+        },
+        "nodeId": {
+          "type": "string"
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "finishedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "error": {
+          "type": "string"
+        }
+      }
+    },
+    "v1RunCaseRequest": {
+      "type": "object",
+      "properties": {
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "caseId": {
+          "type": "string"
+        },
+        "environmentId": {
+          "type": "string"
+        },
+        "runnerId": {
+          "type": "string"
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idempotencyKey": {
+          "type": "string"
+        }
+      }
+    },
+    "v1RunCaseResponse": {
+      "type": "object",
+      "properties": {
+        "run": {
+          "$ref": "#/definitions/v1Run"
+        }
+      }
+    },
+    "v1RunScenarioRequest": {
+      "type": "object",
+      "properties": {
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "scenarioId": {
+          "type": "string"
+        },
+        "environmentId": {
+          "type": "string"
+        },
+        "runnerId": {
+          "type": "string"
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "idempotencyKey": {
+          "type": "string"
+        }
+      }
+    },
+    "v1RunScenarioResponse": {
+      "type": "object",
+      "properties": {
+        "run": {
+          "$ref": "#/definitions/v1Run"
+        }
+      }
+    },
+    "v1RunTaskRequest": {
+      "type": "object",
+      "properties": {
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "taskId": {
+          "type": "string"
+        },
+        "idempotencyKey": {
+          "type": "string"
+        }
+      }
+    },
+    "v1RunTaskResponse": {
+      "type": "object",
+      "properties": {
+        "run": {
+          "$ref": "#/definitions/v1Run"
+        }
+      }
+    },
+    "v1Runner": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "public": {
+          "type": "boolean"
+        },
+        "online": {
+          "type": "boolean"
+        },
+        "revoked": {
+          "type": "boolean"
+        },
+        "registered": {
+          "type": "boolean"
+        },
+        "concurrency": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "version": {
+          "type": "string"
+        },
+        "nodes": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "lastSeen": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1RunnerHeartbeatRequest": {
+      "type": "object",
+      "properties": {
+        "leases": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1RunnerHeartbeatResponse": {
+      "type": "object",
+      "properties": {
+        "active": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "v1RunnerJob": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "type": "string"
+        },
+        "lease": {
+          "type": "string"
+        },
+        "public": {
+          "type": "boolean"
+        },
+        "snapshot": {
+          "$ref": "#/definitions/v1Snapshot"
+        }
+      }
+    },
+    "v1Selection": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Snapshot": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "environment": {
+          "$ref": "#/definitions/v1EnvironmentDefinition"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompiledItem"
+          }
+        },
+        "revisions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1StepResult": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "request": {
+          "$ref": "#/definitions/v1HTTPRequest"
+        },
+        "response": {
+          "$ref": "#/definitions/v1HTTPResponse"
+        },
+        "assertions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AssertionResult"
+          }
+        },
+        "logs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "error": {
+          "type": "string"
+        },
+        "durationMs": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1Task": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string",
+          "format": "int64"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "document": {
+          "$ref": "#/definitions/v1TaskDefinition"
+        }
+      },
+      "description": "Each operation owns a request/response contract. No opaque data envelope."
+    },
+    "v1TaskDefinition": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Selection"
+          }
+        },
+        "environmentId": {
+          "type": "string"
+        },
+        "runnerId": {
+          "type": "string"
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1TestCaseDefinition": {
+      "type": "object",
+      "properties": {
+        "apiId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "request": {
+          "$ref": "#/definitions/v1HTTPRequest"
+        },
+        "override": {
+          "$ref": "#/definitions/v1RequestPatch"
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "collectionVariables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "before": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Operation"
+          }
+        },
+        "after": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Operation"
+          }
+        },
+        "assertions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Assertion"
+          }
+        },
+        "extractions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Extraction"
+          }
+        }
+      }
+    },
+    "v1UpdateTaskRequest": {
+      "type": "object",
+      "properties": {
+        "orgId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "document": {
+          "$ref": "#/definitions/v1TaskDefinition"
+        }
+      }
+    },
+    "v1UpdateTaskResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Variable": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "secret": {
+          "type": "boolean"
+        }
+      },
+      "description": "Fixed low-code fields are structured. Only OpenAPI schemas and arbitrary JSON\nassertion values use Struct/Value; HTTP body remains protocol payload text."
+    }
+  }
+}

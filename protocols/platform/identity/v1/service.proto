@@ -1,0 +1,182 @@
+syntax = "proto3";
+package testmoon.platform.identity.v1;
+option go_package = "github.com/mi991203/TestMoon/protocols/platform/identity/v1;identityv1";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+// Each operation owns a request/response contract. No opaque data envelope.
+message User {
+  string id = 1;
+  string username = 2;
+  string name = 3;
+  bool admin = 4;
+  bool disabled = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message Organization {
+  string id = 1;
+  string name = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message Principal {
+  string user_id = 1;
+  string username = 2;
+  bool admin = 3;
+  map<string,string> organizations = 4;
+  string csrf = 5;
+}
+
+message OrganizationMember {
+  string id = 1;
+  string org_id = 2;
+  string user_id = 3;
+  string username = 4;
+  string name = 5;
+  string role = 6;
+  bool disabled = 7;
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string csrf = 1;
+  User user = 2;
+}
+
+message LogoutRequest {
+}
+
+message LogoutResponse {
+  bool ok = 1;
+}
+
+message SessionRequest {
+  string token = 1;
+}
+
+message SessionResponse {
+  Principal principal = 1;
+  repeated Organization organizations = 2;
+  string csrf = 3;
+}
+
+message ChangePasswordRequest {
+  string old_password = 1;
+  string new_password = 2;
+}
+
+message ChangePasswordResponse {
+  bool ok = 1;
+}
+
+message ListUsersRequest {
+}
+
+message ListUsersResponse {
+  repeated User items = 1;
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string name = 2;
+  string password = 3;
+  bool admin = 4;
+}
+
+message CreateUserResponse {
+  User user = 1;
+}
+
+message ResetPasswordRequest {
+  string id = 1;
+  string password = 2;
+}
+
+message ResetPasswordResponse {
+  bool ok = 1;
+}
+
+message SetUserStatusRequest {
+  string id = 1;
+  bool disabled = 2;
+}
+
+message SetUserStatusResponse {
+  bool ok = 1;
+}
+
+message ListOrganizationsRequest {
+}
+
+message ListOrganizationsResponse {
+  repeated Organization items = 1;
+}
+
+message CreateOrganizationRequest {
+  string name = 1;
+  string admin_user_id = 2;
+}
+
+message CreateOrganizationResponse {
+  Organization organization = 1;
+}
+
+message UpdateOrganizationRequest {
+  string id = 1;
+  string name = 2;
+}
+
+message UpdateOrganizationResponse {
+  Organization organization = 1;
+}
+
+message ListOrganizationMembersRequest {
+  string org_id = 1;
+}
+
+message ListOrganizationMembersResponse {
+  repeated OrganizationMember items = 1;
+}
+
+message SetOrganizationMemberRequest {
+  string org_id = 1;
+  string username = 2;
+  string role = 3;
+}
+
+message SetOrganizationMemberResponse {
+  bool ok = 1;
+}
+
+message RemoveOrganizationMemberRequest {
+  string org_id = 1;
+  string username = 2;
+}
+
+message RemoveOrganizationMemberResponse {
+  bool ok = 1;
+}
+
+service Identity {
+  rpc Login(LoginRequest) returns (LoginResponse) { option (google.api.http) = { post: "/api/platform/v1/login" body: "*" }; }
+  rpc Logout(LogoutRequest) returns (LogoutResponse) { option (google.api.http) = { post: "/api/platform/v1/logout" body: "*" }; }
+  rpc Session(SessionRequest) returns (SessionResponse) { option (google.api.http) = { post: "/api/platform/v1/session" body: "*" }; }
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse) { option (google.api.http) = { post: "/api/platform/v1/change-password" body: "*" }; }
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) { option (google.api.http) = { post: "/api/platform/v1/users" body: "*" }; }
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) { option (google.api.http) = { post: "/api/platform/v1/create-user" body: "*" }; }
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse) { option (google.api.http) = { post: "/api/platform/v1/reset-password" body: "*" }; }
+  rpc SetUserStatus(SetUserStatusRequest) returns (SetUserStatusResponse) { option (google.api.http) = { post: "/api/platform/v1/set-user-status" body: "*" }; }
+  rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) { option (google.api.http) = { post: "/api/platform/v1/organizations" body: "*" }; }
+  rpc CreateOrganization(CreateOrganizationRequest) returns (CreateOrganizationResponse) { option (google.api.http) = { post: "/api/platform/v1/create-organization" body: "*" }; }
+  rpc UpdateOrganization(UpdateOrganizationRequest) returns (UpdateOrganizationResponse) { option (google.api.http) = { post: "/api/platform/v1/update-organization" body: "*" }; }
+  rpc ListOrganizationMembers(ListOrganizationMembersRequest) returns (ListOrganizationMembersResponse) { option (google.api.http) = { post: "/api/platform/v1/members" body: "*" }; }
+  rpc SetOrganizationMember(SetOrganizationMemberRequest) returns (SetOrganizationMemberResponse) { option (google.api.http) = { post: "/api/platform/v1/set-member" body: "*" }; }
+  rpc RemoveOrganizationMember(RemoveOrganizationMemberRequest) returns (RemoveOrganizationMemberResponse) { option (google.api.http) = { post: "/api/platform/v1/remove-member" body: "*" }; }
+}

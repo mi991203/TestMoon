@@ -1,0 +1,135 @@
+syntax = "proto3";
+package testmoon.testing.mock.v1;
+option go_package = "github.com/mi991203/TestMoon/protocols/testing/mock/v1;mockv1";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "protocols/testing/contracts/v1/testing.proto";
+
+// Each operation owns a request/response contract. No opaque data envelope.
+message Endpoint {
+  string id = 1;
+  string org_id = 2;
+  string project_id = 3;
+  string name = 4;
+  reserved 5; // This entity has no editable revision.
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message Rule {
+  string id = 1;
+  string org_id = 2;
+  string project_id = 3;
+  string name = 4;
+  reserved 5; // This entity has no editable revision.
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  string endpoint_id = 8;
+  string method = 9;
+  string path = 10;
+  int32 priority = 11;
+  testmoon.testing.contracts.v1.MockResponse document = 12;
+}
+
+message ListEndpointsRequest {
+  string org_id = 1;
+  string project_id = 2;
+}
+
+message ListEndpointsResponse {
+  repeated Endpoint items = 1;
+}
+
+message ListRulesRequest {
+  string org_id = 1;
+  string project_id = 2;
+}
+
+message ListRulesResponse {
+  repeated Rule items = 1;
+}
+
+message CreateEndpointRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string name = 3;
+}
+
+message CreateEndpointResponse {
+  Endpoint endpoint = 1;
+  string path = 2;
+}
+
+message UpdateEndpointRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+  string name = 4;
+}
+
+message UpdateEndpointResponse {
+  Endpoint endpoint = 1;
+  string path = 2;
+}
+
+message DeleteEndpointRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message DeleteEndpointResponse {
+  bool ok = 1;
+}
+
+message CreateRuleRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string name = 3;
+  string endpoint_id = 4;
+  string method = 5;
+  string path = 6;
+  int32 priority = 7;
+  testmoon.testing.contracts.v1.MockResponse document = 8;
+}
+
+message CreateRuleResponse {
+  string id = 1;
+}
+
+message UpdateRuleRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+  string name = 4;
+  string endpoint_id = 5;
+  string method = 6;
+  string path = 7;
+  int32 priority = 8;
+  testmoon.testing.contracts.v1.MockResponse document = 9;
+}
+
+message UpdateRuleResponse {
+  string id = 1;
+}
+
+message DeleteRuleRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message DeleteRuleResponse {
+  bool ok = 1;
+}
+
+service Mock {
+  rpc ListEndpoints(ListEndpointsRequest) returns (ListEndpointsResponse) { option (google.api.http) = { post: "/api/mock/v1/endpoints" body: "*" }; }
+  rpc ListRules(ListRulesRequest) returns (ListRulesResponse) { option (google.api.http) = { post: "/api/mock/v1/rules" body: "*" }; }
+  rpc CreateEndpoint(CreateEndpointRequest) returns (CreateEndpointResponse) { option (google.api.http) = { post: "/api/mock/v1/create-endpoint" body: "*" }; }
+  rpc UpdateEndpoint(UpdateEndpointRequest) returns (UpdateEndpointResponse) { option (google.api.http) = { post: "/api/mock/v1/update-endpoint" body: "*" }; }
+  rpc DeleteEndpoint(DeleteEndpointRequest) returns (DeleteEndpointResponse) { option (google.api.http) = { post: "/api/mock/v1/delete-endpoint" body: "*" }; }
+  rpc CreateRule(CreateRuleRequest) returns (CreateRuleResponse) { option (google.api.http) = { post: "/api/mock/v1/create-rule" body: "*" }; }
+  rpc UpdateRule(UpdateRuleRequest) returns (UpdateRuleResponse) { option (google.api.http) = { post: "/api/mock/v1/update-rule" body: "*" }; }
+  rpc DeleteRule(DeleteRuleRequest) returns (DeleteRuleResponse) { option (google.api.http) = { post: "/api/mock/v1/delete-rule" body: "*" }; }
+}

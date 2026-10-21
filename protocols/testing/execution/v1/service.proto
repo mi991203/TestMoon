@@ -1,0 +1,313 @@
+syntax = "proto3";
+package testmoon.testing.execution.v1;
+option go_package = "github.com/mi991203/TestMoon/protocols/testing/execution/v1;executionv1";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "protocols/testing/contracts/v1/testing.proto";
+
+// Each operation owns a request/response contract. No opaque data envelope.
+message Task {
+  string id = 1;
+  string org_id = 2;
+  string project_id = 3;
+  string name = 4;
+  int64 revision = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  testmoon.testing.contracts.v1.TaskDefinition document = 8;
+}
+
+message Run {
+  string id = 1;
+  string org_id = 2;
+  string project_id = 3;
+  string name = 4;
+  reserved 5; // This entity has no editable revision.
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  string user_id = 8;
+  string task_id = 9;
+  string state = 10;
+  string target_runner_id = 11;
+  string node_id = 12;
+  int32 timeout_seconds = 13;
+  google.protobuf.Timestamp started_at = 14;
+  google.protobuf.Timestamp finished_at = 15;
+  string error = 16;
+}
+
+message Runner {
+  string id = 1;
+  string org_id = 2;
+  string project_id = 3;
+  string name = 4;
+  reserved 5; // This entity has no editable revision.
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  bool public = 8;
+  bool online = 9;
+  bool revoked = 10;
+  bool registered = 11;
+  int32 concurrency = 12;
+  string version = 13;
+  int32 nodes = 14;
+  google.protobuf.Timestamp last_seen = 15;
+}
+
+message RunnerJob {
+  string run_id = 1;
+  string lease = 2;
+  bool public = 3;
+  testmoon.testing.contracts.v1.Snapshot snapshot = 4;
+}
+
+message ListTasksRequest {
+  string org_id = 1;
+  string project_id = 2;
+}
+
+message ListTasksResponse {
+  repeated Task items = 1;
+}
+
+message CreateTaskRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string name = 3;
+  testmoon.testing.contracts.v1.TaskDefinition document = 4;
+}
+
+message CreateTaskResponse {
+  string id = 1;
+}
+
+message UpdateTaskRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+  int64 revision = 4;
+  string name = 5;
+  testmoon.testing.contracts.v1.TaskDefinition document = 6;
+}
+
+message UpdateTaskResponse {
+  string id = 1;
+}
+
+message DeleteTaskRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message DeleteTaskResponse {
+  bool ok = 1;
+}
+
+message DebugHTTPRequest {
+  string org_id = 1;
+  string project_id = 2;
+  testmoon.testing.contracts.v1.TestCaseDefinition debug = 3;
+  string environment_id = 4;
+  string runner_id = 5;
+  int32 timeout_seconds = 6;
+  string idempotency_key = 7;
+}
+message DebugHTTPResponse {
+  Run run = 1;
+}
+
+message RunCaseRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string case_id = 3;
+  string environment_id = 4;
+  string runner_id = 5;
+  int32 timeout_seconds = 6;
+  string idempotency_key = 7;
+}
+message RunCaseResponse {
+  Run run = 1;
+}
+
+message RunScenarioRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string scenario_id = 3;
+  string environment_id = 4;
+  string runner_id = 5;
+  int32 timeout_seconds = 6;
+  string idempotency_key = 7;
+}
+message RunScenarioResponse {
+  Run run = 1;
+}
+
+message RunTaskRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string task_id = 3;
+  string idempotency_key = 4;
+}
+message RunTaskResponse {
+  Run run = 1;
+}
+
+message ListRunsRequest {
+  string org_id = 1;
+  string project_id = 2;
+}
+
+message ListRunsResponse {
+  repeated Run items = 1;
+}
+
+message GetRunRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message GetRunResponse {
+  Run run = 1;
+  testmoon.testing.contracts.v1.ExecutionResult result = 2;
+}
+
+message CancelRunRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message CancelRunResponse {
+  bool ok = 1;
+}
+
+message ListProjectRunnersRequest {
+  string org_id = 1;
+  string project_id = 2;
+}
+
+message ListProjectRunnersResponse {
+  repeated Runner items = 1;
+}
+
+message CreatePrivateRunnerRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string name = 3;
+  int32 concurrency = 4;
+}
+
+message CreatePrivateRunnerResponse {
+  Runner runner = 1;
+  string enrollment_token = 2;
+}
+
+message RevokePrivateRunnerRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message RevokePrivateRunnerResponse {
+  bool ok = 1;
+}
+
+message ListPublicRunnersRequest {
+}
+
+message ListPublicRunnersResponse {
+  repeated Runner items = 1;
+}
+
+message CreatePublicRunnerRequest {
+  string name = 1;
+  int32 concurrency = 2;
+}
+
+message CreatePublicRunnerResponse {
+  Runner runner = 1;
+  string enrollment_token = 2;
+}
+
+message RevokePublicRunnerRequest {
+  string id = 1;
+}
+
+message RevokePublicRunnerResponse {
+  bool ok = 1;
+}
+
+message RegisterRunnerRequest {
+  string token = 1;
+  string version = 2;
+  repeated string capabilities = 3;
+}
+
+message RegisterRunnerResponse {
+  string runner_id = 1;
+  string credential = 2;
+  bool public = 3;
+  int32 concurrency = 4;
+}
+
+message RunnerHeartbeatRequest {
+  map<string,string> leases = 1;
+}
+
+message RunnerHeartbeatResponse {
+  map<string,bool> active = 1;
+}
+
+message PollRunnerJobRequest {
+}
+
+message PollRunnerJobResponse {
+  RunnerJob job = 1;
+}
+
+message ProgressRunRequest {
+  string id = 1;
+  string lease = 2;
+  testmoon.testing.contracts.v1.ExecutionResult result = 3;
+}
+
+message ProgressRunResponse {
+  bool ok = 1;
+}
+
+message CompleteRunRequest {
+  string id = 1;
+  string lease = 2;
+  testmoon.testing.contracts.v1.ExecutionResult result = 3;
+}
+
+message CompleteRunResponse {
+  bool ok = 1;
+}
+
+service Execution {
+  rpc ListTasks(ListTasksRequest) returns (ListTasksResponse) { option (google.api.http) = { post: "/api/execution/v1/tasks" body: "*" }; }
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse) { option (google.api.http) = { post: "/api/execution/v1/create-task" body: "*" }; }
+  rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse) { option (google.api.http) = { post: "/api/execution/v1/update-task" body: "*" }; }
+  rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse) { option (google.api.http) = { post: "/api/execution/v1/delete-task" body: "*" }; }
+  rpc DebugHTTP(DebugHTTPRequest) returns (DebugHTTPResponse) { option (google.api.http) = { post: "/api/execution/v1/debug-http" body: "*" }; }
+  rpc RunCase(RunCaseRequest) returns (RunCaseResponse) { option (google.api.http) = { post: "/api/execution/v1/run-case" body: "*" }; }
+  rpc RunScenario(RunScenarioRequest) returns (RunScenarioResponse) { option (google.api.http) = { post: "/api/execution/v1/run-scenario" body: "*" }; }
+  rpc RunTask(RunTaskRequest) returns (RunTaskResponse) { option (google.api.http) = { post: "/api/execution/v1/run-task" body: "*" }; }
+  rpc ListRuns(ListRunsRequest) returns (ListRunsResponse) { option (google.api.http) = { post: "/api/execution/v1/runs" body: "*" }; }
+  rpc GetRun(GetRunRequest) returns (GetRunResponse) { option (google.api.http) = { post: "/api/execution/v1/run" body: "*" }; }
+  rpc CancelRun(CancelRunRequest) returns (CancelRunResponse) { option (google.api.http) = { post: "/api/execution/v1/cancel" body: "*" }; }
+  rpc ListProjectRunners(ListProjectRunnersRequest) returns (ListProjectRunnersResponse) { option (google.api.http) = { post: "/api/execution/v1/project-runners/list" body: "*" }; }
+  rpc CreatePrivateRunner(CreatePrivateRunnerRequest) returns (CreatePrivateRunnerResponse) { option (google.api.http) = { post: "/api/execution/v1/private-runners/create" body: "*" }; }
+  rpc RevokePrivateRunner(RevokePrivateRunnerRequest) returns (RevokePrivateRunnerResponse) { option (google.api.http) = { post: "/api/execution/v1/private-runners/revoke" body: "*" }; }
+  rpc ListPublicRunners(ListPublicRunnersRequest) returns (ListPublicRunnersResponse) { option (google.api.http) = { post: "/api/execution/v1/public-runners/list" body: "*" }; }
+  rpc CreatePublicRunner(CreatePublicRunnerRequest) returns (CreatePublicRunnerResponse) { option (google.api.http) = { post: "/api/execution/v1/public-runners/create" body: "*" }; }
+  rpc RevokePublicRunner(RevokePublicRunnerRequest) returns (RevokePublicRunnerResponse) { option (google.api.http) = { post: "/api/execution/v1/public-runners/revoke" body: "*" }; }
+  rpc RegisterRunner(RegisterRunnerRequest) returns (RegisterRunnerResponse) { option (google.api.http) = { post: "/api/runner/v1/register" body: "*" }; }
+  rpc RunnerHeartbeat(RunnerHeartbeatRequest) returns (RunnerHeartbeatResponse) { option (google.api.http) = { post: "/api/runner/v1/heartbeat" body: "*" }; }
+  rpc PollRunnerJob(PollRunnerJobRequest) returns (PollRunnerJobResponse) { option (google.api.http) = { post: "/api/runner/v1/poll" body: "*" }; }
+  rpc ProgressRun(ProgressRunRequest) returns (ProgressRunResponse) { option (google.api.http) = { post: "/api/runner/v1/progress" body: "*" }; }
+  rpc CompleteRun(CompleteRunRequest) returns (CompleteRunResponse) { option (google.api.http) = { post: "/api/runner/v1/complete" body: "*" }; }
+}
