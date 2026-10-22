@@ -73,10 +73,12 @@ func Merge(r HTTPRequest, p RequestPatch) HTTPRequest {
 }
 
 type API struct {
-	Protocol    string      `json:"protocol"`
-	Request     HTTPRequest `json:"request"`
-	Description string      `json:"description"`
-	Schema      any         `json:"schema,omitempty"`
+	Protocol      string      `json:"protocol"`
+	Request       HTTPRequest `json:"request"`
+	Description   string      `json:"description"`
+	Schema        any         `json:"schema,omitempty"`
+	EnvironmentID string      `json:"environment_id"`
+	RunnerID      string      `json:"runner_id"`
 }
 type Operation struct {
 	Type    string `json:"type"`
@@ -107,6 +109,8 @@ type Case struct {
 	After               []Operation       `json:"after"`
 	Assertions          []Assertion       `json:"assertions"`
 	Extractions         []Extraction      `json:"extractions"`
+	EnvironmentID       string            `json:"environment_id"`
+	RunnerID            string            `json:"runner_id"`
 }
 type Step struct {
 	ID                string            `json:"id"`

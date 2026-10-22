@@ -108,6 +108,13 @@ func validateOperations(ops []m.Operation) error {
 }
 
 func validateDocument(deps *runtime.Dependencies, db *gorm.DB, r *ResourceInput, kind string, doc map[string]any) error {
+	if kind == "api" || kind == "case" {
+		if environment, _ := doc["environment_id"].(string); environment != "" {
+			if _, e := LoadResource(deps, db, r.OrgId, r.ProjectId, environment, "environment"); e != nil {
+				return e
+			}
+		}
+	}
 	b, _ := json.Marshal(doc)
 	switch kind {
 	case "api":

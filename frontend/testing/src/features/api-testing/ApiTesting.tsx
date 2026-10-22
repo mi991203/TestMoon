@@ -25,6 +25,7 @@ import { ApiList } from "./ApiList";
 import { ApiDebug } from "./ApiDebug";
 import { CaseList } from "./CaseList";
 import { CaseDetail } from "./CaseDetail";
+import { Imports } from "../imports/ImportsPage";
 export function ApiTesting({ scope, role }: Context) {
   const location = useLocation();
   const go = useScopedNavigate();
@@ -42,6 +43,7 @@ export function ApiTesting({ scope, role }: Context) {
   const [search, setSearch] = useState("");
   const [folderEdit, setFolderEdit] = useState<FolderDraft | null>(null);
   const [expanded, setExpanded] = useState<React.Key[]>([]);
+  const [importFolder, setImportFolder] = useState<string | null>(null);
   const action = useAction();
   const allFolders: Asset<"folder">[] = (folders.data?.items || []).filter(
     (v) => v.document.kind === "api",
@@ -58,7 +60,7 @@ export function ApiTesting({ scope, role }: Context) {
   )?.params.id;
   useEffect(() => {
     const ids: string[] = [];
-    let current = parent.data?.folder_id;
+    let current = selectedFolder || parent.data?.folder_id;
     while (current && !ids.includes(current)) {
       ids.push(current);
       current = (folders.data?.items || []).find(
@@ -68,7 +70,13 @@ export function ApiTesting({ scope, role }: Context) {
     setExpanded((old) => [
       ...new Set([...old, ...ids.map((id) => `folder:${id}`)]),
     ]);
-  }, [parent.data?.folder_id, folders.data]);
+  }, [parent.data?.folder_id, selectedFolder, folders.data]);
+  useEffect(() => {
+    if (location.state?.openImport) {
+      setImportFolder("");
+      go(location.pathname, true, null);
+    }
+  }, [location.state?.openImport]);
   function branches(id: string, seen: string[] = []): DataNode[] {
     if (seen.length > 32) return [];
     const children = allFolders
@@ -119,6 +127,10 @@ export function ApiTesting({ scope, role }: Context) {
         <div className="toolbar">
           <Typography.Text strong>API测试</Typography.Text>
           {editable(role) && (
+            <Space size={4}>
+            <Button size="small" onClick={() => setImportFolder(selectedFolder || parent.data?.folder_id || "")}>
+              导入
+            </Button>
             <Button
               size="small"
               onClick={() =>
@@ -127,6 +139,7 @@ export function ApiTesting({ scope, role }: Context) {
             >
               新建目录
             </Button>
+            </Space>
           )}
         </div>
         <Input.Search
@@ -150,14 +163,16 @@ export function ApiTesting({ scope, role }: Context) {
             ...nodes,
             { key: "unlinked", title: "未关联接口用例", isLeaf: true },
           ]}
-          onSelect={(keys) => {
-            const key = String(keys[0] || "");
+          onSelect={(_, info) => {
+            const key = String(info.node.key);
             if (key === "all") go("/api-testing");
             else if (key === "unlinked") go("/api-testing/unlinked");
             else if (key.startsWith("api:"))
               go(`/api-testing/apis/${key.slice(4)}/debug`);
-            else if (key.startsWith("folder:"))
+            else if (key.startsWith("folder:")) {
+              setExpanded((old) => [...new Set([...old, key])]);
               go(`/api-testing/folders/${key.slice(7)}`);
+            }
           }}
           onDoubleClick={(_, node) => {
             const folder = allFolders.find(
@@ -238,6 +253,17 @@ export function ApiTesting({ scope, role }: Context) {
           />
         </Routes>
       </section>
+      {importFolder !== null && <Imports
+        scope={scope}
+        role={role}
+        initialFolderId={importFolder}
+        onClose={() => setImportFolder(null)}
+        onImported={(folder) => {
+          setImportFolder(null);
+          go(folder ? `/api-testing/folders/${folder}` : "/api-testing");
+          if (folder) setExpanded((old) => [...new Set([...old, `folder:${folder}`])]);
+        }}
+      />}
       {folderEdit && (
         <FolderDialog
           key={folderEdit.id || "new"}

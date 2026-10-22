@@ -11,6 +11,7 @@ export function Shell({
   menu,
   selected,
   onSelect,
+  scopeControls,
   children,
 }: {
   session: IdentitySessionResponse;
@@ -19,6 +20,7 @@ export function Shell({
   menu: { key: string; label: React.ReactNode }[];
   selected: string;
   onSelect: (key: string) => void;
+  scopeControls?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
@@ -45,6 +47,7 @@ export function Shell({
       </Layout.Sider>
       <Layout>
         <Layout.Header className="topbar">
+          <div className="scope-controls">
           <Space>
             <Typography.Text type="secondary">组织空间</Typography.Text>
             <Select
@@ -59,7 +62,9 @@ export function Shell({
               onChange={onOrg}
             />
           </Space>
-          <Space>
+          {scopeControls}
+          </div>
+          <Space className="account-controls">
             <Tag>{session.principal?.username}</Tag>
             <a href="/">统一门户</a>
             <Button

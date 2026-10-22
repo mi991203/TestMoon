@@ -169,6 +169,8 @@ export interface ContractsAPIDefinition {
   request: ContractsHTTPRequest;
   description: string;
   schema: JsonObject;
+  environment_id: string;
+  runner_id: string;
 }
 export interface ContractsOperation {
   type: string;
@@ -199,6 +201,8 @@ export interface ContractsTestCaseDefinition {
   after: ContractsOperation[];
   assertions: ContractsAssertion[];
   extractions: ContractsExtraction[];
+  environment_id: string;
+  runner_id: string;
 }
 export interface ContractsScenarioStep {
   id: string;
@@ -717,6 +721,7 @@ export interface CoreCommitImportRequest {
   id: string;
   selected: string[];
   updates: Record<string, CoreUpdateTarget>;
+  target_folder_id: string;
 }
 export interface CoreCommitImportResponse {
   imported: number;
@@ -872,6 +877,7 @@ export interface ExecutionRunCaseRequest {
   runner_id: string;
   timeout_seconds: number;
   idempotency_key: string;
+  draft: ContractsTestCaseDefinition;
 }
 export interface ExecutionRunCaseResponse {
   run: ExecutionRun;

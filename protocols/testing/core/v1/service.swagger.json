@@ -1383,6 +1383,12 @@
         },
         "schema": {
           "type": "object"
+        },
+        "environmentId": {
+          "type": "string"
+        },
+        "runnerId": {
+          "type": "string"
         }
       }
     },
@@ -1475,6 +1481,9 @@
           "additionalProperties": {
             "$ref": "#/definitions/v1UpdateTarget"
           }
+        },
+        "targetFolderId": {
+          "type": "string"
         }
       }
     },
@@ -2883,6 +2892,12 @@
             "type": "object",
             "$ref": "#/definitions/v1Extraction"
           }
+        },
+        "environmentId": {
+          "type": "string"
+        },
+        "runnerId": {
+          "type": "string"
         }
       }
     },

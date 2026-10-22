@@ -37,11 +37,6 @@ const Documents = lazy(() =>
     default: module.Documents,
   })),
 );
-const Imports = lazy(() =>
-  import("../features/imports/ImportsPage").then((module) => ({
-    default: module.Imports,
-  })),
-);
 const Members = lazy(() =>
   import("../features/members/MembersPage").then((module) => ({
     default: module.Members,
@@ -152,7 +147,6 @@ export function App() {
     { key: "mock", label: "HTTP Mock" },
     { key: "documents", label: "接口文档" },
     { key: "environment", label: "环境管理" },
-    { key: "imports", label: "导入资源" },
     { key: "runners", label: "Runner 管理" },
     { key: "members", label: "项目成员" },
     { key: "projects", label: "项目管理" },
@@ -171,8 +165,7 @@ export function App() {
       menu={menus}
       selected={page}
       onSelect={(key) => go(`/${key}`)}
-    >
-      <div className="toolbar">
+      scopeControls={
         <Space>
           <span>当前项目</span>
           <Select
@@ -206,7 +199,8 @@ export function App() {
             </Tag>
           )}
         </Space>
-      </div>
+      }
+    >
       <ErrorState error={projects.error} />
       {page === "projects" ? (
         <Projects
@@ -299,7 +293,7 @@ export function App() {
             />
             <Route
               path="imports"
-              element={<Imports scope={scope} role={role} />}
+              element={<Navigate to={{ pathname: "/api-testing", search: location.search }} replace state={{ openImport: true }} />}
             />
             <Route
               path="documents"

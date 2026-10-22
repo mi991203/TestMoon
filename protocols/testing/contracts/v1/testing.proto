@@ -45,6 +45,8 @@ message APIDefinition {
   HTTPRequest request = 2;
   string description = 3;
   google.protobuf.Struct schema = 4;
+  string environment_id = 5;
+  string runner_id = 6;
 }
 
 message Operation {
@@ -79,6 +81,8 @@ message TestCaseDefinition {
   repeated Operation after = 8;
   repeated Assertion assertions = 9;
   repeated Extraction extractions = 10;
+  string environment_id = 11;
+  string runner_id = 12;
 }
 
 message ScenarioStep {

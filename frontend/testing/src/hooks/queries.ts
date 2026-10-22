@@ -34,7 +34,22 @@ export function useRunners(scope: Scope) {
   return useQuery({
     queryKey: ["runners", scope.org_id, scope.project_id],
     enabled: !!scope.project_id,
-    queryFn: () => execution.listProjectRunners(scope),
+    queryFn: async () => {
+      const result = await execution.listProjectRunners(scope);
+      return { ...result, items: result.items.filter((v) => !v.revoked) };
+    },
     refetchInterval: 10000,
+  });
+}
+
+export function useRun(scope: Scope, id?: string) {
+  return useQuery({
+    queryKey: ["run", scope.org_id, scope.project_id, id],
+    enabled: !!id,
+    queryFn: () => execution.getRun({ ...scope, id: id! }),
+    refetchInterval: (q) =>
+      ["created", "queued", "running"].includes(q.state.data?.run.state || "")
+        ? 2000
+        : false,
   });
 }

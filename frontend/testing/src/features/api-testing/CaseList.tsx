@@ -1,14 +1,15 @@
-import type { ContractsSelection } from "@testmoon/api";
+import { execution } from "@testmoon/api";
 
 import type { Asset } from "../../models/resources";
 import { resources } from "../../services/resources";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Card, Input, Popconfirm, Space, Spin, Table } from "antd";
 import { ErrorState, PageHeading, useAction } from "@testmoon/web";
-import { useAssets, useResource } from "../../hooks/queries";
+import { useAssets, useResource, useRun } from "../../hooks/queries";
 import { useScopedNavigate } from "../../hooks/navigation";
-import { RunDialog } from "../../components/resources";
+import { RunResult } from "../../components/resources/RunResult";
+import { active } from "../reports/state";
 
 import { Context, editable } from "./context";
 import { ApiHeader } from "./ApiHeader";
@@ -21,10 +22,20 @@ export function CaseList({
   const parent = useResource(scope, "api", apiId);
   const query = useAssets(scope, "case", unlinked ? "" : apiId);
   const [search, setSearch] = useState("");
-  const [selection, setSelection] =
-    useState<Partial<ContractsSelection> | null>(null);
+  const [runId, setRunId] = useState("");
+  const [executionError, setExecutionError] = useState<unknown>();
+  const result = useRun(scope, runId);
+  const resultRef = useRef<HTMLDivElement>(null);
+  const running = !!runId && (result.isPending || active(result.data?.run.state || ""));
   const go = useScopedNavigate();
-  const { run } = useAction();
+  const { busy, run } = useAction();
+  useEffect(() => {
+    setRunId("");
+    setExecutionError(undefined);
+  }, [apiId, unlinked]);
+  useEffect(() => {
+    if (runId) resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [runId]);
   if (apiId && parent.isPending) return <Spin />;
   if (parent.error) return <ErrorState error={parent.error} />;
   return (
@@ -89,7 +100,25 @@ export function CaseList({
                   {editable(role) && (
                     <>
                       <Button
-                        onClick={() => setSelection({ kind: "case", id: v.id })}
+                        disabled={busy || running}
+                        onClick={() => {
+                          setExecutionError(undefined);
+                          run(async () => {
+                            try {
+                              const out = await execution.runCase({
+                                ...scope,
+                                case_id: v.id,
+                                environment_id: v.document.environment_id || "",
+                                runner_id: v.document.runner_id || "public",
+                                idempotency_key: crypto.randomUUID(),
+                              });
+                              setRunId(out.run.id);
+                            } catch (error) {
+                              setExecutionError(error);
+                              throw error;
+                            }
+                          }, "执行已提交");
+                        }}
                       >
                         执行
                       </Button>
@@ -112,14 +141,10 @@ export function CaseList({
           ]}
         />
       </Card>
-      {selection && (
-        <RunDialog
-          scope={scope}
-          selection={selection}
-          onClose={() => setSelection(null)}
-          onRun={(id) => go(`/reports/${id}`)}
-        />
-      )}
+      <ErrorState error={executionError} />
+      {runId && <div ref={resultRef} className="inline-run-result">
+        <RunResult scope={scope} id={runId} onReport={() => go(`/reports/${runId}`)} />
+      </div>}
     </>
   );
 }

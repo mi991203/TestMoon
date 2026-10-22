@@ -9,17 +9,25 @@ import React, { useState } from "react";
 import {
   Alert,
   Button,
-  Card,
+  Modal,
   Select,
   Space,
   Table,
   Typography,
   Upload,
 } from "antd";
-import { Code, PageHeading, Scope, useAction } from "@testmoon/web";
+import { Code, Scope, useAction } from "@testmoon/web";
 import { useAssets } from "../../hooks/queries";
+import { folderOptions } from "../../components/resources/defaults";
 
-export function Imports({ scope, role }: { scope: Scope; role: string }) {
+export function Imports({ scope, role, initialFolderId, onClose, onImported }: {
+  scope: Scope;
+  role: string;
+  initialFolderId: string;
+  onClose: () => void;
+  onImported: (folder: string) => void;
+}) {
+  const [targetFolder, setTargetFolder] = useState(initialFolderId);
   const [format, setFormat] = useState("postman");
   const [content, setContent] = useState("");
   const [preview, setPreview] = useState<Awaited<
@@ -42,25 +50,33 @@ export function Imports({ scope, role }: { scope: Scope; role: string }) {
   const { busy, run } = useAction();
   const editable = role === "admin" || role === "editor";
   return (
-    <>
-      <PageHeading
-        title="接口与用例导入"
-        description="先预览，再确认新增或更新；不支持的格式和能力明确诊断。"
-      />
-      <Card>
-        <Space style={{ marginBottom: 16 }}>
+    <Modal title="接口与用例导入" open width={1100} footer={null}
+      onCancel={onClose} closable={!busy} keyboard={!busy} maskClosable={!busy}>
+        <Space wrap style={{ marginBottom: 16 }}>
+          <span>导入到</span>
+          <Select
+            aria-label="导入目标目录"
+            className="import-target"
+            value={targetFolder}
+            disabled={!editable || busy}
+            showSearch
+            optionFilterProp="label"
+            options={folderOptions(folders.data?.items || [], "api")}
+            onChange={setTargetFolder}
+          />
           <Select
             value={format}
-            disabled={!editable}
+            disabled={!editable || busy}
             style={{ width: 250 }}
             options={[
               { value: "postman", label: "Postman Collection v2.1" },
               { value: "openapi", label: "OpenAPI 2.0 / 3.0 / 3.1" },
             ]}
-            onChange={setFormat}
+            onChange={(value) => { setFormat(value); setPreview(null); }}
           />
           <Upload
             accept=".json,.yaml,.yml"
+            disabled={!editable || busy}
             showUploadList={false}
             beforeUpload={async (file) => {
               setContent(await file.text());
@@ -68,11 +84,11 @@ export function Imports({ scope, role }: { scope: Scope; role: string }) {
               return false;
             }}
           >
-            <Button disabled={!editable}>选择文件</Button>
+            <Button disabled={!editable || busy}>选择文件</Button>
           </Upload>
           <Button
             type="primary"
-            disabled={!editable || !content}
+            disabled={!editable || !content || busy}
             loading={busy}
             onClick={() =>
               run(async () => {
@@ -95,9 +111,9 @@ export function Imports({ scope, role }: { scope: Scope; role: string }) {
         <Code
           language={format === "openapi" ? "yaml" : "json"}
           value={content}
-          onChange={setContent}
+          onChange={(value) => { setContent(value); setPreview(null); }}
           height={280}
-          readOnly={!editable}
+          readOnly={!editable || busy}
         />
         {preview && (
           <>
@@ -128,8 +144,10 @@ export function Imports({ scope, role }: { scope: Scope; role: string }) {
               rowSelection={{
                 selectedRowKeys: selected,
                 onChange: setSelected,
+                getCheckboxProps: () => ({ disabled: busy }),
               }}
               pagination={{ pageSize: 15 }}
+              scroll={{ x: 650 }}
               columns={[
                 { title: "类型", dataIndex: "kind" },
                 { title: "名称", dataIndex: "name" },
@@ -138,6 +156,7 @@ export function Imports({ scope, role }: { scope: Scope; role: string }) {
                   render: (_, v) => (
                     <Select
                       style={{ width: 280 }}
+                      disabled={busy}
                       allowClear
                       placeholder="新增资源"
                       value={updates[v.temp_id]?.id}
@@ -180,20 +199,22 @@ export function Imports({ scope, role }: { scope: Scope; role: string }) {
                     ...scope,
                     ...{ selected: selected.map(String), updates },
                     id: preview.batch_id,
+                    target_folder_id: targetFolder,
                   });
                   setPreview(null);
                   setContent("");
+                  onImported(targetFolder);
                 }, "导入完成")
               }
             >
               确认提交 {selected.length} 项
             </Button>
             <Typography.Paragraph type="secondary" style={{ marginTop: 12 }}>
+              新增接口保留源目录层级并导入所选目录；用例、场景保留各自目录和接口关联。更新已有资源时保留原位置。
               引用的接口、用例和父目录必须同时选中；更新目标若已变化，整个提交会拒绝。
             </Typography.Paragraph>
           </>
         )}
-      </Card>
-    </>
+    </Modal>
   );
 }

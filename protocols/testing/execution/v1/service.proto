@@ -125,6 +125,8 @@ message RunCaseRequest {
   string runner_id = 5;
   int32 timeout_seconds = 6;
   string idempotency_key = 7;
+  // When supplied, execute this draft without saving the case definition.
+  testmoon.testing.contracts.v1.TestCaseDefinition draft = 8;
 }
 message RunCaseResponse {
   Run run = 1;
