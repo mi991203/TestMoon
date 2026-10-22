@@ -24,7 +24,7 @@ func (s *Server) ListProjectRunners(ctx context.Context, r *pb.ListProjectRunner
 		return nil, e
 	}
 	var nodes []model.Runner
-	if e := deps.DB.Where("(org_id = ? AND project_id = ?) OR public = ?", r.OrgId, r.ProjectId, true).Order("created_at").Find(&nodes).Error; e != nil {
+	if e := deps.DB.Where("((org_id = ? AND project_id = ?) OR public = ?) AND revoked = ?", r.OrgId, r.ProjectId, true, false).Order("created_at").Find(&nodes).Error; e != nil {
 		return nil, p.DBError(e)
 	}
 	items := []any{}

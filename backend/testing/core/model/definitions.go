@@ -13,6 +13,8 @@ type DefinitionOwner struct {
 }
 type APIDefinition struct {
 	DefinitionOwner
+	EnvironmentID string `gorm:"type:char(36);not null;default:''"`
+	RunnerID      string `gorm:"size:36;not null;default:''"`
 	Protocol      string `gorm:"size:24;not null"`
 	Description   string `gorm:"type:text"`
 	RequestCipher string `gorm:"type:longtext;not null"`
@@ -20,6 +22,8 @@ type APIDefinition struct {
 }
 type TestCaseDefinition struct {
 	DefinitionOwner
+	EnvironmentID             string `gorm:"type:char(36);not null;default:''"`
+	RunnerID                  string `gorm:"size:36;not null;default:''"`
 	Name                      string `gorm:"size:128;not null;default:''"`
 	APIID                     string `gorm:"type:char(36);index:case_api;not null;default:''"`
 	RequestCipher             string `gorm:"type:longtext"`

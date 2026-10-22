@@ -1082,8 +1082,10 @@ type RunCaseRequest struct {
 	RunnerId       string                 `protobuf:"bytes,5,opt,name=runner_id,json=runnerId,proto3" json:"runner_id,omitempty"`
 	TimeoutSeconds int32                  `protobuf:"varint,6,opt,name=timeout_seconds,json=timeoutSeconds,proto3" json:"timeout_seconds,omitempty"`
 	IdempotencyKey string                 `protobuf:"bytes,7,opt,name=idempotency_key,json=idempotencyKey,proto3" json:"idempotency_key,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// When supplied, execute this draft without saving the case definition.
+	Draft         *v1.TestCaseDefinition `protobuf:"bytes,8,opt,name=draft,proto3" json:"draft,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *RunCaseRequest) Reset() {
@@ -1163,6 +1165,13 @@ func (x *RunCaseRequest) GetIdempotencyKey() string {
 		return x.IdempotencyKey
 	}
 	return ""
+}
+
+func (x *RunCaseRequest) GetDraft() *v1.TestCaseDefinition {
+	if x != nil {
+		return x.Draft
+	}
+	return nil
 }
 
 type RunCaseResponse struct {
@@ -2971,7 +2980,7 @@ const file_protocols_testing_execution_v1_service_proto_rawDesc = "" +
 	"\x0ftimeout_seconds\x18\x06 \x01(\x05R\x0etimeoutSeconds\x12'\n" +
 	"\x0fidempotency_key\x18\a \x01(\tR\x0eidempotencyKey\"I\n" +
 	"\x11DebugHTTPResponse\x124\n" +
-	"\x03run\x18\x01 \x01(\v2\".testmoon.testing.execution.v1.RunR\x03run\"\xf5\x01\n" +
+	"\x03run\x18\x01 \x01(\v2\".testmoon.testing.execution.v1.RunR\x03run\"\xbe\x02\n" +
 	"\x0eRunCaseRequest\x12\x15\n" +
 	"\x06org_id\x18\x01 \x01(\tR\x05orgId\x12\x1d\n" +
 	"\n" +
@@ -2980,7 +2989,8 @@ const file_protocols_testing_execution_v1_service_proto_rawDesc = "" +
 	"\x0eenvironment_id\x18\x04 \x01(\tR\renvironmentId\x12\x1b\n" +
 	"\trunner_id\x18\x05 \x01(\tR\brunnerId\x12'\n" +
 	"\x0ftimeout_seconds\x18\x06 \x01(\x05R\x0etimeoutSeconds\x12'\n" +
-	"\x0fidempotency_key\x18\a \x01(\tR\x0eidempotencyKey\"G\n" +
+	"\x0fidempotency_key\x18\a \x01(\tR\x0eidempotencyKey\x12G\n" +
+	"\x05draft\x18\b \x01(\v21.testmoon.testing.contracts.v1.TestCaseDefinitionR\x05draft\"G\n" +
 	"\x0fRunCaseResponse\x124\n" +
 	"\x03run\x18\x01 \x01(\v2\".testmoon.testing.execution.v1.RunR\x03run\"\x81\x02\n" +
 	"\x12RunScenarioRequest\x12\x15\n" +
@@ -3209,70 +3219,71 @@ var file_protocols_testing_execution_v1_service_proto_depIdxs = []int32{
 	51, // 13: testmoon.testing.execution.v1.UpdateTaskRequest.document:type_name -> testmoon.testing.contracts.v1.TaskDefinition
 	53, // 14: testmoon.testing.execution.v1.DebugHTTPRequest.debug:type_name -> testmoon.testing.contracts.v1.TestCaseDefinition
 	1,  // 15: testmoon.testing.execution.v1.DebugHTTPResponse.run:type_name -> testmoon.testing.execution.v1.Run
-	1,  // 16: testmoon.testing.execution.v1.RunCaseResponse.run:type_name -> testmoon.testing.execution.v1.Run
-	1,  // 17: testmoon.testing.execution.v1.RunScenarioResponse.run:type_name -> testmoon.testing.execution.v1.Run
-	1,  // 18: testmoon.testing.execution.v1.RunTaskResponse.run:type_name -> testmoon.testing.execution.v1.Run
-	1,  // 19: testmoon.testing.execution.v1.ListRunsResponse.items:type_name -> testmoon.testing.execution.v1.Run
-	1,  // 20: testmoon.testing.execution.v1.GetRunResponse.run:type_name -> testmoon.testing.execution.v1.Run
-	54, // 21: testmoon.testing.execution.v1.GetRunResponse.result:type_name -> testmoon.testing.contracts.v1.ExecutionResult
-	2,  // 22: testmoon.testing.execution.v1.ListProjectRunnersResponse.items:type_name -> testmoon.testing.execution.v1.Runner
-	2,  // 23: testmoon.testing.execution.v1.CreatePrivateRunnerResponse.runner:type_name -> testmoon.testing.execution.v1.Runner
-	2,  // 24: testmoon.testing.execution.v1.ListPublicRunnersResponse.items:type_name -> testmoon.testing.execution.v1.Runner
-	2,  // 25: testmoon.testing.execution.v1.CreatePublicRunnerResponse.runner:type_name -> testmoon.testing.execution.v1.Runner
-	48, // 26: testmoon.testing.execution.v1.RunnerHeartbeatRequest.leases:type_name -> testmoon.testing.execution.v1.RunnerHeartbeatRequest.LeasesEntry
-	49, // 27: testmoon.testing.execution.v1.RunnerHeartbeatResponse.active:type_name -> testmoon.testing.execution.v1.RunnerHeartbeatResponse.ActiveEntry
-	3,  // 28: testmoon.testing.execution.v1.PollRunnerJobResponse.job:type_name -> testmoon.testing.execution.v1.RunnerJob
-	54, // 29: testmoon.testing.execution.v1.ProgressRunRequest.result:type_name -> testmoon.testing.contracts.v1.ExecutionResult
-	54, // 30: testmoon.testing.execution.v1.CompleteRunRequest.result:type_name -> testmoon.testing.contracts.v1.ExecutionResult
-	4,  // 31: testmoon.testing.execution.v1.Execution.ListTasks:input_type -> testmoon.testing.execution.v1.ListTasksRequest
-	6,  // 32: testmoon.testing.execution.v1.Execution.CreateTask:input_type -> testmoon.testing.execution.v1.CreateTaskRequest
-	8,  // 33: testmoon.testing.execution.v1.Execution.UpdateTask:input_type -> testmoon.testing.execution.v1.UpdateTaskRequest
-	10, // 34: testmoon.testing.execution.v1.Execution.DeleteTask:input_type -> testmoon.testing.execution.v1.DeleteTaskRequest
-	12, // 35: testmoon.testing.execution.v1.Execution.DebugHTTP:input_type -> testmoon.testing.execution.v1.DebugHTTPRequest
-	14, // 36: testmoon.testing.execution.v1.Execution.RunCase:input_type -> testmoon.testing.execution.v1.RunCaseRequest
-	16, // 37: testmoon.testing.execution.v1.Execution.RunScenario:input_type -> testmoon.testing.execution.v1.RunScenarioRequest
-	18, // 38: testmoon.testing.execution.v1.Execution.RunTask:input_type -> testmoon.testing.execution.v1.RunTaskRequest
-	20, // 39: testmoon.testing.execution.v1.Execution.ListRuns:input_type -> testmoon.testing.execution.v1.ListRunsRequest
-	22, // 40: testmoon.testing.execution.v1.Execution.GetRun:input_type -> testmoon.testing.execution.v1.GetRunRequest
-	24, // 41: testmoon.testing.execution.v1.Execution.CancelRun:input_type -> testmoon.testing.execution.v1.CancelRunRequest
-	26, // 42: testmoon.testing.execution.v1.Execution.ListProjectRunners:input_type -> testmoon.testing.execution.v1.ListProjectRunnersRequest
-	28, // 43: testmoon.testing.execution.v1.Execution.CreatePrivateRunner:input_type -> testmoon.testing.execution.v1.CreatePrivateRunnerRequest
-	30, // 44: testmoon.testing.execution.v1.Execution.RevokePrivateRunner:input_type -> testmoon.testing.execution.v1.RevokePrivateRunnerRequest
-	32, // 45: testmoon.testing.execution.v1.Execution.ListPublicRunners:input_type -> testmoon.testing.execution.v1.ListPublicRunnersRequest
-	34, // 46: testmoon.testing.execution.v1.Execution.CreatePublicRunner:input_type -> testmoon.testing.execution.v1.CreatePublicRunnerRequest
-	36, // 47: testmoon.testing.execution.v1.Execution.RevokePublicRunner:input_type -> testmoon.testing.execution.v1.RevokePublicRunnerRequest
-	38, // 48: testmoon.testing.execution.v1.Execution.RegisterRunner:input_type -> testmoon.testing.execution.v1.RegisterRunnerRequest
-	40, // 49: testmoon.testing.execution.v1.Execution.RunnerHeartbeat:input_type -> testmoon.testing.execution.v1.RunnerHeartbeatRequest
-	42, // 50: testmoon.testing.execution.v1.Execution.PollRunnerJob:input_type -> testmoon.testing.execution.v1.PollRunnerJobRequest
-	44, // 51: testmoon.testing.execution.v1.Execution.ProgressRun:input_type -> testmoon.testing.execution.v1.ProgressRunRequest
-	46, // 52: testmoon.testing.execution.v1.Execution.CompleteRun:input_type -> testmoon.testing.execution.v1.CompleteRunRequest
-	5,  // 53: testmoon.testing.execution.v1.Execution.ListTasks:output_type -> testmoon.testing.execution.v1.ListTasksResponse
-	7,  // 54: testmoon.testing.execution.v1.Execution.CreateTask:output_type -> testmoon.testing.execution.v1.CreateTaskResponse
-	9,  // 55: testmoon.testing.execution.v1.Execution.UpdateTask:output_type -> testmoon.testing.execution.v1.UpdateTaskResponse
-	11, // 56: testmoon.testing.execution.v1.Execution.DeleteTask:output_type -> testmoon.testing.execution.v1.DeleteTaskResponse
-	13, // 57: testmoon.testing.execution.v1.Execution.DebugHTTP:output_type -> testmoon.testing.execution.v1.DebugHTTPResponse
-	15, // 58: testmoon.testing.execution.v1.Execution.RunCase:output_type -> testmoon.testing.execution.v1.RunCaseResponse
-	17, // 59: testmoon.testing.execution.v1.Execution.RunScenario:output_type -> testmoon.testing.execution.v1.RunScenarioResponse
-	19, // 60: testmoon.testing.execution.v1.Execution.RunTask:output_type -> testmoon.testing.execution.v1.RunTaskResponse
-	21, // 61: testmoon.testing.execution.v1.Execution.ListRuns:output_type -> testmoon.testing.execution.v1.ListRunsResponse
-	23, // 62: testmoon.testing.execution.v1.Execution.GetRun:output_type -> testmoon.testing.execution.v1.GetRunResponse
-	25, // 63: testmoon.testing.execution.v1.Execution.CancelRun:output_type -> testmoon.testing.execution.v1.CancelRunResponse
-	27, // 64: testmoon.testing.execution.v1.Execution.ListProjectRunners:output_type -> testmoon.testing.execution.v1.ListProjectRunnersResponse
-	29, // 65: testmoon.testing.execution.v1.Execution.CreatePrivateRunner:output_type -> testmoon.testing.execution.v1.CreatePrivateRunnerResponse
-	31, // 66: testmoon.testing.execution.v1.Execution.RevokePrivateRunner:output_type -> testmoon.testing.execution.v1.RevokePrivateRunnerResponse
-	33, // 67: testmoon.testing.execution.v1.Execution.ListPublicRunners:output_type -> testmoon.testing.execution.v1.ListPublicRunnersResponse
-	35, // 68: testmoon.testing.execution.v1.Execution.CreatePublicRunner:output_type -> testmoon.testing.execution.v1.CreatePublicRunnerResponse
-	37, // 69: testmoon.testing.execution.v1.Execution.RevokePublicRunner:output_type -> testmoon.testing.execution.v1.RevokePublicRunnerResponse
-	39, // 70: testmoon.testing.execution.v1.Execution.RegisterRunner:output_type -> testmoon.testing.execution.v1.RegisterRunnerResponse
-	41, // 71: testmoon.testing.execution.v1.Execution.RunnerHeartbeat:output_type -> testmoon.testing.execution.v1.RunnerHeartbeatResponse
-	43, // 72: testmoon.testing.execution.v1.Execution.PollRunnerJob:output_type -> testmoon.testing.execution.v1.PollRunnerJobResponse
-	45, // 73: testmoon.testing.execution.v1.Execution.ProgressRun:output_type -> testmoon.testing.execution.v1.ProgressRunResponse
-	47, // 74: testmoon.testing.execution.v1.Execution.CompleteRun:output_type -> testmoon.testing.execution.v1.CompleteRunResponse
-	53, // [53:75] is the sub-list for method output_type
-	31, // [31:53] is the sub-list for method input_type
-	31, // [31:31] is the sub-list for extension type_name
-	31, // [31:31] is the sub-list for extension extendee
-	0,  // [0:31] is the sub-list for field type_name
+	53, // 16: testmoon.testing.execution.v1.RunCaseRequest.draft:type_name -> testmoon.testing.contracts.v1.TestCaseDefinition
+	1,  // 17: testmoon.testing.execution.v1.RunCaseResponse.run:type_name -> testmoon.testing.execution.v1.Run
+	1,  // 18: testmoon.testing.execution.v1.RunScenarioResponse.run:type_name -> testmoon.testing.execution.v1.Run
+	1,  // 19: testmoon.testing.execution.v1.RunTaskResponse.run:type_name -> testmoon.testing.execution.v1.Run
+	1,  // 20: testmoon.testing.execution.v1.ListRunsResponse.items:type_name -> testmoon.testing.execution.v1.Run
+	1,  // 21: testmoon.testing.execution.v1.GetRunResponse.run:type_name -> testmoon.testing.execution.v1.Run
+	54, // 22: testmoon.testing.execution.v1.GetRunResponse.result:type_name -> testmoon.testing.contracts.v1.ExecutionResult
+	2,  // 23: testmoon.testing.execution.v1.ListProjectRunnersResponse.items:type_name -> testmoon.testing.execution.v1.Runner
+	2,  // 24: testmoon.testing.execution.v1.CreatePrivateRunnerResponse.runner:type_name -> testmoon.testing.execution.v1.Runner
+	2,  // 25: testmoon.testing.execution.v1.ListPublicRunnersResponse.items:type_name -> testmoon.testing.execution.v1.Runner
+	2,  // 26: testmoon.testing.execution.v1.CreatePublicRunnerResponse.runner:type_name -> testmoon.testing.execution.v1.Runner
+	48, // 27: testmoon.testing.execution.v1.RunnerHeartbeatRequest.leases:type_name -> testmoon.testing.execution.v1.RunnerHeartbeatRequest.LeasesEntry
+	49, // 28: testmoon.testing.execution.v1.RunnerHeartbeatResponse.active:type_name -> testmoon.testing.execution.v1.RunnerHeartbeatResponse.ActiveEntry
+	3,  // 29: testmoon.testing.execution.v1.PollRunnerJobResponse.job:type_name -> testmoon.testing.execution.v1.RunnerJob
+	54, // 30: testmoon.testing.execution.v1.ProgressRunRequest.result:type_name -> testmoon.testing.contracts.v1.ExecutionResult
+	54, // 31: testmoon.testing.execution.v1.CompleteRunRequest.result:type_name -> testmoon.testing.contracts.v1.ExecutionResult
+	4,  // 32: testmoon.testing.execution.v1.Execution.ListTasks:input_type -> testmoon.testing.execution.v1.ListTasksRequest
+	6,  // 33: testmoon.testing.execution.v1.Execution.CreateTask:input_type -> testmoon.testing.execution.v1.CreateTaskRequest
+	8,  // 34: testmoon.testing.execution.v1.Execution.UpdateTask:input_type -> testmoon.testing.execution.v1.UpdateTaskRequest
+	10, // 35: testmoon.testing.execution.v1.Execution.DeleteTask:input_type -> testmoon.testing.execution.v1.DeleteTaskRequest
+	12, // 36: testmoon.testing.execution.v1.Execution.DebugHTTP:input_type -> testmoon.testing.execution.v1.DebugHTTPRequest
+	14, // 37: testmoon.testing.execution.v1.Execution.RunCase:input_type -> testmoon.testing.execution.v1.RunCaseRequest
+	16, // 38: testmoon.testing.execution.v1.Execution.RunScenario:input_type -> testmoon.testing.execution.v1.RunScenarioRequest
+	18, // 39: testmoon.testing.execution.v1.Execution.RunTask:input_type -> testmoon.testing.execution.v1.RunTaskRequest
+	20, // 40: testmoon.testing.execution.v1.Execution.ListRuns:input_type -> testmoon.testing.execution.v1.ListRunsRequest
+	22, // 41: testmoon.testing.execution.v1.Execution.GetRun:input_type -> testmoon.testing.execution.v1.GetRunRequest
+	24, // 42: testmoon.testing.execution.v1.Execution.CancelRun:input_type -> testmoon.testing.execution.v1.CancelRunRequest
+	26, // 43: testmoon.testing.execution.v1.Execution.ListProjectRunners:input_type -> testmoon.testing.execution.v1.ListProjectRunnersRequest
+	28, // 44: testmoon.testing.execution.v1.Execution.CreatePrivateRunner:input_type -> testmoon.testing.execution.v1.CreatePrivateRunnerRequest
+	30, // 45: testmoon.testing.execution.v1.Execution.RevokePrivateRunner:input_type -> testmoon.testing.execution.v1.RevokePrivateRunnerRequest
+	32, // 46: testmoon.testing.execution.v1.Execution.ListPublicRunners:input_type -> testmoon.testing.execution.v1.ListPublicRunnersRequest
+	34, // 47: testmoon.testing.execution.v1.Execution.CreatePublicRunner:input_type -> testmoon.testing.execution.v1.CreatePublicRunnerRequest
+	36, // 48: testmoon.testing.execution.v1.Execution.RevokePublicRunner:input_type -> testmoon.testing.execution.v1.RevokePublicRunnerRequest
+	38, // 49: testmoon.testing.execution.v1.Execution.RegisterRunner:input_type -> testmoon.testing.execution.v1.RegisterRunnerRequest
+	40, // 50: testmoon.testing.execution.v1.Execution.RunnerHeartbeat:input_type -> testmoon.testing.execution.v1.RunnerHeartbeatRequest
+	42, // 51: testmoon.testing.execution.v1.Execution.PollRunnerJob:input_type -> testmoon.testing.execution.v1.PollRunnerJobRequest
+	44, // 52: testmoon.testing.execution.v1.Execution.ProgressRun:input_type -> testmoon.testing.execution.v1.ProgressRunRequest
+	46, // 53: testmoon.testing.execution.v1.Execution.CompleteRun:input_type -> testmoon.testing.execution.v1.CompleteRunRequest
+	5,  // 54: testmoon.testing.execution.v1.Execution.ListTasks:output_type -> testmoon.testing.execution.v1.ListTasksResponse
+	7,  // 55: testmoon.testing.execution.v1.Execution.CreateTask:output_type -> testmoon.testing.execution.v1.CreateTaskResponse
+	9,  // 56: testmoon.testing.execution.v1.Execution.UpdateTask:output_type -> testmoon.testing.execution.v1.UpdateTaskResponse
+	11, // 57: testmoon.testing.execution.v1.Execution.DeleteTask:output_type -> testmoon.testing.execution.v1.DeleteTaskResponse
+	13, // 58: testmoon.testing.execution.v1.Execution.DebugHTTP:output_type -> testmoon.testing.execution.v1.DebugHTTPResponse
+	15, // 59: testmoon.testing.execution.v1.Execution.RunCase:output_type -> testmoon.testing.execution.v1.RunCaseResponse
+	17, // 60: testmoon.testing.execution.v1.Execution.RunScenario:output_type -> testmoon.testing.execution.v1.RunScenarioResponse
+	19, // 61: testmoon.testing.execution.v1.Execution.RunTask:output_type -> testmoon.testing.execution.v1.RunTaskResponse
+	21, // 62: testmoon.testing.execution.v1.Execution.ListRuns:output_type -> testmoon.testing.execution.v1.ListRunsResponse
+	23, // 63: testmoon.testing.execution.v1.Execution.GetRun:output_type -> testmoon.testing.execution.v1.GetRunResponse
+	25, // 64: testmoon.testing.execution.v1.Execution.CancelRun:output_type -> testmoon.testing.execution.v1.CancelRunResponse
+	27, // 65: testmoon.testing.execution.v1.Execution.ListProjectRunners:output_type -> testmoon.testing.execution.v1.ListProjectRunnersResponse
+	29, // 66: testmoon.testing.execution.v1.Execution.CreatePrivateRunner:output_type -> testmoon.testing.execution.v1.CreatePrivateRunnerResponse
+	31, // 67: testmoon.testing.execution.v1.Execution.RevokePrivateRunner:output_type -> testmoon.testing.execution.v1.RevokePrivateRunnerResponse
+	33, // 68: testmoon.testing.execution.v1.Execution.ListPublicRunners:output_type -> testmoon.testing.execution.v1.ListPublicRunnersResponse
+	35, // 69: testmoon.testing.execution.v1.Execution.CreatePublicRunner:output_type -> testmoon.testing.execution.v1.CreatePublicRunnerResponse
+	37, // 70: testmoon.testing.execution.v1.Execution.RevokePublicRunner:output_type -> testmoon.testing.execution.v1.RevokePublicRunnerResponse
+	39, // 71: testmoon.testing.execution.v1.Execution.RegisterRunner:output_type -> testmoon.testing.execution.v1.RegisterRunnerResponse
+	41, // 72: testmoon.testing.execution.v1.Execution.RunnerHeartbeat:output_type -> testmoon.testing.execution.v1.RunnerHeartbeatResponse
+	43, // 73: testmoon.testing.execution.v1.Execution.PollRunnerJob:output_type -> testmoon.testing.execution.v1.PollRunnerJobResponse
+	45, // 74: testmoon.testing.execution.v1.Execution.ProgressRun:output_type -> testmoon.testing.execution.v1.ProgressRunResponse
+	47, // 75: testmoon.testing.execution.v1.Execution.CompleteRun:output_type -> testmoon.testing.execution.v1.CompleteRunResponse
+	54, // [54:76] is the sub-list for method output_type
+	32, // [32:54] is the sub-list for method input_type
+	32, // [32:32] is the sub-list for extension type_name
+	32, // [32:32] is the sub-list for extension extendee
+	0,  // [0:32] is the sub-list for field type_name
 }
 
 func init() { file_protocols_testing_execution_v1_service_proto_init() }

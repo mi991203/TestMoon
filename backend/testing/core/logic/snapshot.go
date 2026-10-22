@@ -76,7 +76,11 @@ func BuildSnapshot(ctx context.Context, deps *runtime.Dependencies, in SnapshotI
 			if e != nil {
 				return e
 			}
-			out.Items = append(out.Items, m.CompiledItem{ID: p.NewBase().ID, Name: "接口调试", Steps: []m.CompiledStep{{ID: p.NewBase().ID, Name: "调试请求", Case: c}}})
+			name := c.Name
+			if name == "" {
+				name = "接口调试"
+			}
+			out.Items = append(out.Items, m.CompiledItem{ID: p.NewBase().ID, Name: name, CollectionVariables: c.CollectionVariables, Steps: []m.CompiledStep{{ID: p.NewBase().ID, Name: name, Case: c}}})
 		}
 		for _, sel := range in.Items {
 			if sel.Kind != "case" && sel.Kind != "scenario" {

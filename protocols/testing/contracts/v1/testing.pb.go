@@ -366,6 +366,8 @@ type APIDefinition struct {
 	Request       *HTTPRequest           `protobuf:"bytes,2,opt,name=request,proto3" json:"request,omitempty"`
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	Schema        *structpb.Struct       `protobuf:"bytes,4,opt,name=schema,proto3" json:"schema,omitempty"`
+	EnvironmentId string                 `protobuf:"bytes,5,opt,name=environment_id,json=environmentId,proto3" json:"environment_id,omitempty"`
+	RunnerId      string                 `protobuf:"bytes,6,opt,name=runner_id,json=runnerId,proto3" json:"runner_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -426,6 +428,20 @@ func (x *APIDefinition) GetSchema() *structpb.Struct {
 		return x.Schema
 	}
 	return nil
+}
+
+func (x *APIDefinition) GetEnvironmentId() string {
+	if x != nil {
+		return x.EnvironmentId
+	}
+	return ""
+}
+
+func (x *APIDefinition) GetRunnerId() string {
+	if x != nil {
+		return x.RunnerId
+	}
+	return ""
 }
 
 type Operation struct {
@@ -644,6 +660,8 @@ type TestCaseDefinition struct {
 	After               []*Operation           `protobuf:"bytes,8,rep,name=after,proto3" json:"after,omitempty"`
 	Assertions          []*Assertion           `protobuf:"bytes,9,rep,name=assertions,proto3" json:"assertions,omitempty"`
 	Extractions         []*Extraction          `protobuf:"bytes,10,rep,name=extractions,proto3" json:"extractions,omitempty"`
+	EnvironmentId       string                 `protobuf:"bytes,11,opt,name=environment_id,json=environmentId,proto3" json:"environment_id,omitempty"`
+	RunnerId            string                 `protobuf:"bytes,12,opt,name=runner_id,json=runnerId,proto3" json:"runner_id,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -746,6 +764,20 @@ func (x *TestCaseDefinition) GetExtractions() []*Extraction {
 		return x.Extractions
 	}
 	return nil
+}
+
+func (x *TestCaseDefinition) GetEnvironmentId() string {
+	if x != nil {
+		return x.EnvironmentId
+	}
+	return ""
+}
+
+func (x *TestCaseDefinition) GetRunnerId() string {
+	if x != nil {
+		return x.RunnerId
+	}
+	return ""
 }
 
 type ScenarioStep struct {
@@ -1964,12 +1996,14 @@ const file_protocols_testing_contracts_v1_testing_proto_rawDesc = "" +
 	"\x04_urlB\f\n" +
 	"\n" +
 	"_body_typeB\a\n" +
-	"\x05_body\"\xc4\x01\n" +
+	"\x05_body\"\x88\x02\n" +
 	"\rAPIDefinition\x12\x1a\n" +
 	"\bprotocol\x18\x01 \x01(\tR\bprotocol\x12D\n" +
 	"\arequest\x18\x02 \x01(\v2*.testmoon.testing.contracts.v1.HTTPRequestR\arequest\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12/\n" +
-	"\x06schema\x18\x04 \x01(\v2\x17.google.protobuf.StructR\x06schema\"i\n" +
+	"\x06schema\x18\x04 \x01(\v2\x17.google.protobuf.StructR\x06schema\x12%\n" +
+	"\x0eenvironment_id\x18\x05 \x01(\tR\renvironmentId\x12\x1b\n" +
+	"\trunner_id\x18\x06 \x01(\tR\brunnerId\"i\n" +
 	"\tOperation\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12\x18\n" +
 	"\aversion\x18\x02 \x01(\x05R\aversion\x12\x16\n" +
@@ -1985,7 +2019,7 @@ const file_protocols_testing_contracts_v1_testing_proto_rawDesc = "" +
 	"\x06source\x18\x01 \x01(\tR\x06source\x12\x12\n" +
 	"\x04path\x18\x02 \x01(\tR\x04path\x12\x1a\n" +
 	"\bvariable\x18\x03 \x01(\tR\bvariable\x12\x16\n" +
-	"\x06secret\x18\x04 \x01(\bR\x06secret\"\xcc\x06\n" +
+	"\x06secret\x18\x04 \x01(\bR\x06secret\"\x90\a\n" +
 	"\x12TestCaseDefinition\x12\x15\n" +
 	"\x06api_id\x18\x01 \x01(\tR\x05apiId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12D\n" +
@@ -1999,7 +2033,9 @@ const file_protocols_testing_contracts_v1_testing_proto_rawDesc = "" +
 	"assertions\x18\t \x03(\v2(.testmoon.testing.contracts.v1.AssertionR\n" +
 	"assertions\x12K\n" +
 	"\vextractions\x18\n" +
-	" \x03(\v2).testmoon.testing.contracts.v1.ExtractionR\vextractions\x1a<\n" +
+	" \x03(\v2).testmoon.testing.contracts.v1.ExtractionR\vextractions\x12%\n" +
+	"\x0eenvironment_id\x18\v \x01(\tR\renvironmentId\x12\x1b\n" +
+	"\trunner_id\x18\f \x01(\tR\brunnerId\x1a<\n" +
 	"\x0eVariablesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +

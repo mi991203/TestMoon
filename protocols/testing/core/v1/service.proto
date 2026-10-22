@@ -501,6 +501,7 @@ message CommitImportRequest {
   string id = 3;
   repeated string selected = 4;
   map<string,UpdateTarget> updates = 5;
+  string target_folder_id = 6;
 }
 
 message CommitImportResponse {

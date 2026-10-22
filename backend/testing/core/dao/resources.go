@@ -82,14 +82,14 @@ func (s *Resources) writeDefinition(db *gorm.DB, r model.Resource) error {
 		if e := json.Unmarshal(raw, &v); e != nil {
 			return e
 		}
-		record = &model.APIDefinition{DefinitionOwner: owner(r), Protocol: v.Protocol, Description: v.Description, RequestCipher: seal(v.Request), SchemaCipher: seal(v.Schema)}
+		record = &model.APIDefinition{DefinitionOwner: owner(r), Protocol: v.Protocol, Description: v.Description, RequestCipher: seal(v.Request), SchemaCipher: seal(v.Schema), EnvironmentID: v.EnvironmentID, RunnerID: v.RunnerID}
 	case "case":
 		var v m.Case
 		raw, _ := json.Marshal(doc)
 		if e := json.Unmarshal(raw, &v); e != nil {
 			return e
 		}
-		record = &model.TestCaseDefinition{DefinitionOwner: owner(r), Name: v.Name, APIID: v.APIID, RequestCipher: seal(v.Request), OverrideCipher: seal(v.Override), VariablesCipher: seal(v.Variables), CollectionVariablesCipher: seal(v.CollectionVariables), BeforeCipher: seal(v.Before), AfterCipher: seal(v.After), AssertionsCipher: seal(v.Assertions), ExtractionsCipher: seal(v.Extractions)}
+		record = &model.TestCaseDefinition{DefinitionOwner: owner(r), Name: v.Name, APIID: v.APIID, RequestCipher: seal(v.Request), OverrideCipher: seal(v.Override), VariablesCipher: seal(v.Variables), CollectionVariablesCipher: seal(v.CollectionVariables), BeforeCipher: seal(v.Before), AfterCipher: seal(v.After), AssertionsCipher: seal(v.Assertions), ExtractionsCipher: seal(v.Extractions), EnvironmentID: v.EnvironmentID, RunnerID: v.RunnerID}
 	case "scenario":
 		var v m.Scenario
 		raw, _ := json.Marshal(doc)
@@ -171,7 +171,7 @@ func (s *Resources) Document(db *gorm.DB, r model.Resource) (map[string]any, err
 		if e := find(db, r, &row); e != nil {
 			return nil, e
 		}
-		v := m.API{Protocol: row.Protocol, Description: row.Description}
+		v := m.API{Protocol: row.Protocol, Description: row.Description, EnvironmentID: row.EnvironmentID, RunnerID: row.RunnerID}
 		open(row.RequestCipher, &v.Request)
 		open(row.SchemaCipher, &v.Schema)
 		value = v
@@ -180,7 +180,7 @@ func (s *Resources) Document(db *gorm.DB, r model.Resource) (map[string]any, err
 		if e := find(db, r, &row); e != nil {
 			return nil, e
 		}
-		v := m.Case{Name: row.Name, APIID: row.APIID}
+		v := m.Case{Name: row.Name, APIID: row.APIID, EnvironmentID: row.EnvironmentID, RunnerID: row.RunnerID}
 		open(row.RequestCipher, &v.Request)
 		open(row.OverrideCipher, &v.Override)
 		open(row.VariablesCipher, &v.Variables)

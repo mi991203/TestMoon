@@ -4924,14 +4924,15 @@ func (x *PreviewImportResponse) GetExpiresAt() *timestamppb.Timestamp {
 }
 
 type CommitImportRequest struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
-	OrgId         string                   `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
-	ProjectId     string                   `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
-	Id            string                   `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
-	Selected      []string                 `protobuf:"bytes,4,rep,name=selected,proto3" json:"selected,omitempty"`
-	Updates       map[string]*UpdateTarget `protobuf:"bytes,5,rep,name=updates,proto3" json:"updates,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState   `protogen:"open.v1"`
+	OrgId          string                   `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
+	ProjectId      string                   `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	Id             string                   `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
+	Selected       []string                 `protobuf:"bytes,4,rep,name=selected,proto3" json:"selected,omitempty"`
+	Updates        map[string]*UpdateTarget `protobuf:"bytes,5,rep,name=updates,proto3" json:"updates,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	TargetFolderId string                   `protobuf:"bytes,6,opt,name=target_folder_id,json=targetFolderId,proto3" json:"target_folder_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *CommitImportRequest) Reset() {
@@ -4997,6 +4998,13 @@ func (x *CommitImportRequest) GetUpdates() map[string]*UpdateTarget {
 		return x.Updates
 	}
 	return nil
+}
+
+func (x *CommitImportRequest) GetTargetFolderId() string {
+	if x != nil {
+		return x.TargetFolderId
+	}
+	return ""
 }
 
 type CommitImportResponse struct {
@@ -6018,14 +6026,15 @@ const file_protocols_testing_core_v1_service_proto_rawDesc = "" +
 	"\aentries\x18\x02 \x03(\v2%.testmoon.testing.core.v1.ImportEntryR\aentries\x12 \n" +
 	"\vdiagnostics\x18\x03 \x03(\tR\vdiagnostics\x129\n" +
 	"\n" +
-	"expires_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"\xb1\x02\n" +
+	"expires_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"\xdb\x02\n" +
 	"\x13CommitImportRequest\x12\x15\n" +
 	"\x06org_id\x18\x01 \x01(\tR\x05orgId\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x02 \x01(\tR\tprojectId\x12\x0e\n" +
 	"\x02id\x18\x03 \x01(\tR\x02id\x12\x1a\n" +
 	"\bselected\x18\x04 \x03(\tR\bselected\x12T\n" +
-	"\aupdates\x18\x05 \x03(\v2:.testmoon.testing.core.v1.CommitImportRequest.UpdatesEntryR\aupdates\x1ab\n" +
+	"\aupdates\x18\x05 \x03(\v2:.testmoon.testing.core.v1.CommitImportRequest.UpdatesEntryR\aupdates\x12(\n" +
+	"\x10target_folder_id\x18\x06 \x01(\tR\x0etargetFolderId\x1ab\n" +
 	"\fUpdatesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12<\n" +
 	"\x05value\x18\x02 \x01(\v2&.testmoon.testing.core.v1.UpdateTargetR\x05value:\x028\x01\"2\n" +

@@ -83,14 +83,22 @@ func (s *Server) RunCase(ctx context.Context, r *pb.RunCaseRequest) (*pb.RunCase
 	if err := deps.Core.Authorize(ctx, r.OrgId, r.ProjectId, "execute"); err != nil {
 		return nil, err
 	}
-	if r.CaseId == "" {
+	if r.CaseId == "" && r.Draft == nil {
 		return nil, p.Bad("缺少执行目标")
 	}
 	input := &logic.RunInput{}
 	if err := p.Decode(r, input); err != nil {
 		return nil, err
 	}
-	input.Items = []m.Selection{{Kind: "case", ID: r.CaseId}}
+	if r.Draft != nil {
+		var draft m.Case
+		if err := p.Decode(r.Draft, &draft); err != nil {
+			return nil, err
+		}
+		input.Debug = &draft
+	} else {
+		input.Items = []m.Selection{{Kind: "case", ID: r.CaseId}}
+	}
 	out, err := logic.StartRun(ctx, deps, input)
 	if err != nil {
 		return nil, err

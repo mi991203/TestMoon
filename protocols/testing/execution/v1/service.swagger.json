@@ -1522,6 +1522,10 @@
         },
         "idempotencyKey": {
           "type": "string"
+        },
+        "draft": {
+          "$ref": "#/definitions/v1TestCaseDefinition",
+          "description": "When supplied, execute this draft without saving the case definition."
         }
       }
     },
@@ -1880,6 +1884,12 @@
             "type": "object",
             "$ref": "#/definitions/v1Extraction"
           }
+        },
+        "environmentId": {
+          "type": "string"
+        },
+        "runnerId": {
+          "type": "string"
         }
       }
     },

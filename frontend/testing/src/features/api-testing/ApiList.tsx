@@ -25,9 +25,19 @@ export function ApiList({ scope, role }: Context) {
     folders = useAssets(scope, "folder");
   const [search, setSearch] = useState("");
   const { run } = useAction();
+  const descendants = new Set(folderId ? [folderId] : []);
+  const pending = [...descendants];
+  for (let i = 0; i < pending.length; i++) {
+    for (const folder of folders.data?.items || []) {
+      if (folder.document.kind === "api" && folder.folder_id === pending[i] && !descendants.has(folder.id)) {
+        descendants.add(folder.id);
+        pending.push(folder.id);
+      }
+    }
+  }
   const items: Asset<"api">[] = (query.data?.items || []).filter(
     (v) =>
-      (!folderId || v.folder_id === folderId) &&
+      (!folderId || descendants.has(v.folder_id)) &&
       v.name.toLowerCase().includes(search.toLowerCase()),
   );
   return (
