@@ -1,0 +1,7 @@
+.git
+.local
+.tools
+**/node_modules
+**/dist
+deploy/local/.env
+*.log

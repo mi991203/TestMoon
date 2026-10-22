@@ -1,0 +1,608 @@
+syntax = "proto3";
+package testmoon.testing.core.v1;
+option go_package = "github.com/mi991203/TestMoon/protocols/testing/core/v1;corev1";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "protocols/testing/contracts/v1/testing.proto";
+
+// Each operation owns a request/response contract. No opaque data envelope.
+message Project {
+  string id = 1;
+  string org_id = 2;
+  string name = 3;
+  string description = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message ProjectMember {
+  string id = 1;
+  string org_id = 2;
+  string project_id = 3;
+  string user_id = 4;
+  string role = 5;
+}
+
+message API {
+  string id = 1;
+  string org_id = 2;
+  string project_id = 3;
+  string name = 4;
+  int64 revision = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  string folder_id = 8;
+  testmoon.testing.contracts.v1.APIDefinition document = 9;
+}
+
+message ListAPIsRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string search = 3;
+  optional string folder_id = 4;
+}
+
+message ListAPIsResponse {
+  repeated API items = 1;
+}
+
+message GetAPIRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message GetAPIResponse {
+  API resource = 1;
+}
+
+message CreateAPIRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string name = 3;
+  string folder_id = 4;
+  testmoon.testing.contracts.v1.APIDefinition document = 5;
+}
+
+message CreateAPIResponse {
+  API resource = 1;
+}
+
+message UpdateAPIRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+  int64 revision = 4;
+  string name = 5;
+  string folder_id = 6;
+  testmoon.testing.contracts.v1.APIDefinition document = 7;
+}
+
+message UpdateAPIResponse {
+  API resource = 1;
+}
+
+message DeleteAPIRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message DeleteAPIResponse {
+  bool ok = 1;
+}
+
+message TestCase {
+  string id = 1;
+  string org_id = 2;
+  string project_id = 3;
+  string name = 4;
+  int64 revision = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  string folder_id = 8;
+  testmoon.testing.contracts.v1.TestCaseDefinition document = 9;
+}
+
+message ListTestCasesRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string search = 3;
+  optional string folder_id = 4;
+  optional string api_id = 5;
+}
+
+message ListTestCasesResponse {
+  repeated TestCase items = 1;
+}
+
+message GetTestCaseRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message GetTestCaseResponse {
+  TestCase resource = 1;
+}
+
+message CreateTestCaseRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string name = 3;
+  string folder_id = 4;
+  testmoon.testing.contracts.v1.TestCaseDefinition document = 5;
+}
+
+message CreateTestCaseResponse {
+  TestCase resource = 1;
+}
+
+message UpdateTestCaseRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+  int64 revision = 4;
+  string name = 5;
+  string folder_id = 6;
+  testmoon.testing.contracts.v1.TestCaseDefinition document = 7;
+}
+
+message UpdateTestCaseResponse {
+  TestCase resource = 1;
+}
+
+message DeleteTestCaseRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message DeleteTestCaseResponse {
+  bool ok = 1;
+}
+
+message Scenario {
+  string id = 1;
+  string org_id = 2;
+  string project_id = 3;
+  string name = 4;
+  int64 revision = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  string folder_id = 8;
+  testmoon.testing.contracts.v1.ScenarioDefinition document = 9;
+}
+
+message ListScenariosRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string search = 3;
+  optional string folder_id = 4;
+}
+
+message ListScenariosResponse {
+  repeated Scenario items = 1;
+}
+
+message GetScenarioRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message GetScenarioResponse {
+  Scenario resource = 1;
+}
+
+message CreateScenarioRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string name = 3;
+  string folder_id = 4;
+  testmoon.testing.contracts.v1.ScenarioDefinition document = 5;
+}
+
+message CreateScenarioResponse {
+  Scenario resource = 1;
+}
+
+message UpdateScenarioRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+  int64 revision = 4;
+  string name = 5;
+  string folder_id = 6;
+  testmoon.testing.contracts.v1.ScenarioDefinition document = 7;
+}
+
+message UpdateScenarioResponse {
+  Scenario resource = 1;
+}
+
+message DeleteScenarioRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message DeleteScenarioResponse {
+  bool ok = 1;
+}
+
+message Environment {
+  string id = 1;
+  string org_id = 2;
+  string project_id = 3;
+  string name = 4;
+  int64 revision = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  string folder_id = 8;
+  testmoon.testing.contracts.v1.EnvironmentDefinition document = 9;
+}
+
+message ListEnvironmentsRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string search = 3;
+  optional string folder_id = 4;
+}
+
+message ListEnvironmentsResponse {
+  repeated Environment items = 1;
+}
+
+message GetEnvironmentRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message GetEnvironmentResponse {
+  Environment resource = 1;
+}
+
+message CreateEnvironmentRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string name = 3;
+  string folder_id = 4;
+  testmoon.testing.contracts.v1.EnvironmentDefinition document = 5;
+}
+
+message CreateEnvironmentResponse {
+  Environment resource = 1;
+}
+
+message UpdateEnvironmentRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+  int64 revision = 4;
+  string name = 5;
+  string folder_id = 6;
+  testmoon.testing.contracts.v1.EnvironmentDefinition document = 7;
+}
+
+message UpdateEnvironmentResponse {
+  Environment resource = 1;
+}
+
+message DeleteEnvironmentRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message DeleteEnvironmentResponse {
+  bool ok = 1;
+}
+
+message Folder {
+  string id = 1;
+  string org_id = 2;
+  string project_id = 3;
+  string name = 4;
+  int64 revision = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  string folder_id = 8;
+  testmoon.testing.contracts.v1.FolderDefinition document = 9;
+}
+
+message ListFoldersRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string search = 3;
+  optional string folder_id = 4;
+}
+
+message ListFoldersResponse {
+  repeated Folder items = 1;
+}
+
+message GetFolderRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message GetFolderResponse {
+  Folder resource = 1;
+}
+
+message CreateFolderRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string name = 3;
+  string folder_id = 4;
+  testmoon.testing.contracts.v1.FolderDefinition document = 5;
+}
+
+message CreateFolderResponse {
+  Folder resource = 1;
+}
+
+message UpdateFolderRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+  int64 revision = 4;
+  string name = 5;
+  string folder_id = 6;
+  testmoon.testing.contracts.v1.FolderDefinition document = 7;
+}
+
+message UpdateFolderResponse {
+  Folder resource = 1;
+}
+
+message DeleteFolderRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message DeleteFolderResponse {
+  bool ok = 1;
+}
+
+message ListProjectsRequest {
+  string org_id = 1;
+}
+
+message ListProjectsResponse {
+  repeated Project items = 1;
+}
+
+message CreateProjectRequest {
+  string org_id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+message CreateProjectResponse {
+  Project project = 1;
+}
+
+message UpdateProjectRequest {
+  string org_id = 1;
+  string id = 2;
+  string name = 3;
+  string description = 4;
+}
+
+message UpdateProjectResponse {
+  Project project = 1;
+}
+
+message DeleteProjectRequest {
+  string org_id = 1;
+  string project_id = 2;
+}
+
+message DeleteProjectResponse {
+  bool ok = 1;
+}
+
+message AuthorizeRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string permission = 3;
+}
+
+message AuthorizeResponse {
+  string role = 1;
+  bool active = 2;
+}
+
+message ListProjectMembersRequest {
+  string org_id = 1;
+  string project_id = 2;
+}
+
+message ListProjectMembersResponse {
+  repeated ProjectMember items = 1;
+}
+
+message SetProjectMemberRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string user_id = 3;
+  string role = 4;
+}
+
+message SetProjectMemberResponse {
+  bool ok = 1;
+}
+
+message RemoveProjectMemberRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string user_id = 3;
+}
+
+message RemoveProjectMemberResponse {
+  bool ok = 1;
+}
+
+message CreateSnapshotRequest {
+  string org_id = 1;
+  string project_id = 2;
+  repeated testmoon.testing.contracts.v1.Selection items = 3;
+  string environment_id = 4;
+  string runner_id = 5;
+  int32 timeout_seconds = 6;
+  testmoon.testing.contracts.v1.TestCaseDefinition debug = 7;
+}
+
+message CreateSnapshotResponse {
+  testmoon.testing.contracts.v1.Snapshot snapshot = 1;
+}
+
+message ImportEntry {
+  string temp_id = 1;
+  string kind = 2;
+  string name = 3;
+  string folder = 4;
+  oneof definition {
+  testmoon.testing.contracts.v1.APIDefinition api = 5;
+  testmoon.testing.contracts.v1.TestCaseDefinition test_case = 6;
+  testmoon.testing.contracts.v1.ScenarioDefinition scenario = 7;
+  testmoon.testing.contracts.v1.EnvironmentDefinition environment = 8;
+  testmoon.testing.contracts.v1.FolderDefinition folder_definition = 9;
+  }
+}
+
+message UpdateTarget {
+  string id = 1;
+  int64 revision = 2;
+}
+
+message PreviewImportRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string format = 3;
+  string content = 4;
+}
+
+message PreviewImportResponse {
+  string batch_id = 1;
+  repeated ImportEntry entries = 2;
+  repeated string diagnostics = 3;
+  google.protobuf.Timestamp expires_at = 4;
+}
+
+message CommitImportRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+  repeated string selected = 4;
+  map<string,UpdateTarget> updates = 5;
+}
+
+message CommitImportResponse {
+  int32 imported = 1;
+}
+
+message Share {
+  string id = 1;
+  string name = 2;
+  string url = 3;
+  bool password_required = 4;
+  google.protobuf.Timestamp expires_at = 5;
+}
+
+message SharedAPI {
+  string id = 1;
+  string name = 2;
+  testmoon.testing.contracts.v1.APIDefinition document = 3;
+}
+
+message ListSharesRequest {
+  string org_id = 1;
+  string project_id = 2;
+}
+
+message ListSharesResponse {
+  repeated Share items = 1;
+}
+
+message CreateShareRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string name = 3;
+  repeated string api_ids = 4;
+  string password = 5;
+  google.protobuf.Timestamp expires_at = 6;
+}
+
+message CreateShareResponse {
+  string id = 1;
+  string url = 2;
+}
+
+message DeleteShareRequest {
+  string org_id = 1;
+  string project_id = 2;
+  string id = 3;
+}
+
+message DeleteShareResponse {
+  bool ok = 1;
+}
+
+message ReadSharedDocumentRequest {
+  string token = 1;
+  string password = 2;
+}
+
+message ReadSharedDocumentResponse {
+  string name = 1;
+  repeated SharedAPI items = 2;
+}
+
+service Core {
+  rpc ListAPIs(ListAPIsRequest) returns (ListAPIsResponse) { option (google.api.http) = { post: "/api/testing/v1/apis/list" body: "*" }; }
+  rpc GetAPI(GetAPIRequest) returns (GetAPIResponse) { option (google.api.http) = { post: "/api/testing/v1/apis/get" body: "*" }; }
+  rpc CreateAPI(CreateAPIRequest) returns (CreateAPIResponse) { option (google.api.http) = { post: "/api/testing/v1/apis/create" body: "*" }; }
+  rpc UpdateAPI(UpdateAPIRequest) returns (UpdateAPIResponse) { option (google.api.http) = { post: "/api/testing/v1/apis/update" body: "*" }; }
+  rpc DeleteAPI(DeleteAPIRequest) returns (DeleteAPIResponse) { option (google.api.http) = { post: "/api/testing/v1/apis/delete" body: "*" }; }
+  rpc ListTestCases(ListTestCasesRequest) returns (ListTestCasesResponse) { option (google.api.http) = { post: "/api/testing/v1/cases/list" body: "*" }; }
+  rpc GetTestCase(GetTestCaseRequest) returns (GetTestCaseResponse) { option (google.api.http) = { post: "/api/testing/v1/cases/get" body: "*" }; }
+  rpc CreateTestCase(CreateTestCaseRequest) returns (CreateTestCaseResponse) { option (google.api.http) = { post: "/api/testing/v1/cases/create" body: "*" }; }
+  rpc UpdateTestCase(UpdateTestCaseRequest) returns (UpdateTestCaseResponse) { option (google.api.http) = { post: "/api/testing/v1/cases/update" body: "*" }; }
+  rpc DeleteTestCase(DeleteTestCaseRequest) returns (DeleteTestCaseResponse) { option (google.api.http) = { post: "/api/testing/v1/cases/delete" body: "*" }; }
+  rpc ListScenarios(ListScenariosRequest) returns (ListScenariosResponse) { option (google.api.http) = { post: "/api/testing/v1/scenarios/list" body: "*" }; }
+  rpc GetScenario(GetScenarioRequest) returns (GetScenarioResponse) { option (google.api.http) = { post: "/api/testing/v1/scenarios/get" body: "*" }; }
+  rpc CreateScenario(CreateScenarioRequest) returns (CreateScenarioResponse) { option (google.api.http) = { post: "/api/testing/v1/scenarios/create" body: "*" }; }
+  rpc UpdateScenario(UpdateScenarioRequest) returns (UpdateScenarioResponse) { option (google.api.http) = { post: "/api/testing/v1/scenarios/update" body: "*" }; }
+  rpc DeleteScenario(DeleteScenarioRequest) returns (DeleteScenarioResponse) { option (google.api.http) = { post: "/api/testing/v1/scenarios/delete" body: "*" }; }
+  rpc ListEnvironments(ListEnvironmentsRequest) returns (ListEnvironmentsResponse) { option (google.api.http) = { post: "/api/testing/v1/environments/list" body: "*" }; }
+  rpc GetEnvironment(GetEnvironmentRequest) returns (GetEnvironmentResponse) { option (google.api.http) = { post: "/api/testing/v1/environments/get" body: "*" }; }
+  rpc CreateEnvironment(CreateEnvironmentRequest) returns (CreateEnvironmentResponse) { option (google.api.http) = { post: "/api/testing/v1/environments/create" body: "*" }; }
+  rpc UpdateEnvironment(UpdateEnvironmentRequest) returns (UpdateEnvironmentResponse) { option (google.api.http) = { post: "/api/testing/v1/environments/update" body: "*" }; }
+  rpc DeleteEnvironment(DeleteEnvironmentRequest) returns (DeleteEnvironmentResponse) { option (google.api.http) = { post: "/api/testing/v1/environments/delete" body: "*" }; }
+  rpc ListFolders(ListFoldersRequest) returns (ListFoldersResponse) { option (google.api.http) = { post: "/api/testing/v1/folders/list" body: "*" }; }
+  rpc GetFolder(GetFolderRequest) returns (GetFolderResponse) { option (google.api.http) = { post: "/api/testing/v1/folders/get" body: "*" }; }
+  rpc CreateFolder(CreateFolderRequest) returns (CreateFolderResponse) { option (google.api.http) = { post: "/api/testing/v1/folders/create" body: "*" }; }
+  rpc UpdateFolder(UpdateFolderRequest) returns (UpdateFolderResponse) { option (google.api.http) = { post: "/api/testing/v1/folders/update" body: "*" }; }
+  rpc DeleteFolder(DeleteFolderRequest) returns (DeleteFolderResponse) { option (google.api.http) = { post: "/api/testing/v1/folders/delete" body: "*" }; }
+  rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) { option (google.api.http) = { post: "/api/testing/v1/projects" body: "*" }; }
+  rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse) { option (google.api.http) = { post: "/api/testing/v1/create-project" body: "*" }; }
+  rpc UpdateProject(UpdateProjectRequest) returns (UpdateProjectResponse) { option (google.api.http) = { post: "/api/testing/v1/update-project" body: "*" }; }
+  rpc DeleteProject(DeleteProjectRequest) returns (DeleteProjectResponse) { option (google.api.http) = { post: "/api/testing/v1/delete-project" body: "*" }; }
+  rpc Authorize(AuthorizeRequest) returns (AuthorizeResponse) { option (google.api.http) = { post: "/api/testing/v1/authorize" body: "*" }; }
+  rpc ListProjectMembers(ListProjectMembersRequest) returns (ListProjectMembersResponse) { option (google.api.http) = { post: "/api/testing/v1/members" body: "*" }; }
+  rpc SetProjectMember(SetProjectMemberRequest) returns (SetProjectMemberResponse) { option (google.api.http) = { post: "/api/testing/v1/set-member" body: "*" }; }
+  rpc RemoveProjectMember(RemoveProjectMemberRequest) returns (RemoveProjectMemberResponse) { option (google.api.http) = { post: "/api/testing/v1/remove-member" body: "*" }; }
+  rpc CreateSnapshot(CreateSnapshotRequest) returns (CreateSnapshotResponse) { option (google.api.http) = { post: "/api/testing/v1/snapshot" body: "*" }; }
+  rpc PreviewImport(PreviewImportRequest) returns (PreviewImportResponse) { option (google.api.http) = { post: "/api/testing/v1/import-preview" body: "*" }; }
+  rpc CommitImport(CommitImportRequest) returns (CommitImportResponse) { option (google.api.http) = { post: "/api/testing/v1/import-commit" body: "*" }; }
+  rpc ListShares(ListSharesRequest) returns (ListSharesResponse) { option (google.api.http) = { post: "/api/testing/v1/shares" body: "*" }; }
+  rpc CreateShare(CreateShareRequest) returns (CreateShareResponse) { option (google.api.http) = { post: "/api/testing/v1/create-share" body: "*" }; }
+  rpc DeleteShare(DeleteShareRequest) returns (DeleteShareResponse) { option (google.api.http) = { post: "/api/testing/v1/delete-share" body: "*" }; }
+  rpc ReadSharedDocument(ReadSharedDocumentRequest) returns (ReadSharedDocumentResponse) { option (google.api.http) = { post: "/api/share/v1/document" body: "*" }; }
+}

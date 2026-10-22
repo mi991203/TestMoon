@@ -1,0 +1,19 @@
+{
+  "name": "@testmoon/web",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "dependencies": {
+    "react": "catalog:",
+    "antd": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "@monaco-editor/react": "catalog:",
+    "monaco-editor": "catalog:",
+    "@testmoon/api": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:"
+  }
+}

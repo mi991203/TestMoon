@@ -1,0 +1,202 @@
+syntax = "proto3";
+package testmoon.testing.contracts.v1;
+option go_package = "github.com/mi991203/TestMoon/protocols/testing/contracts/v1;contractsv1";
+import "google/protobuf/struct.proto";
+// Fixed low-code fields are structured. Only OpenAPI schemas and arbitrary JSON
+// assertion values use Struct/Value; HTTP body remains protocol payload text.
+message Variable {
+  string value = 1;
+  bool secret = 2;
+}
+
+message Auth {
+  string type = 1;
+  string username = 2;
+  string password = 3;
+  string token = 4;
+  string key = 5;
+  string value = 6;
+  string in = 7;
+}
+
+message HTTPRequest {
+  string method = 1;
+  string url = 2;
+  map<string,string> headers = 3;
+  map<string,string> query = 4;
+  string body_type = 5;
+  string body = 6;
+  Auth auth = 7;
+  int32 timeout_ms = 8;
+}
+
+message RequestPatch {
+  optional string method = 1;
+  optional string url = 2;
+  map<string,string> headers = 3;
+  map<string,string> query = 4;
+  optional string body_type = 5;
+  optional string body = 6;
+  Auth auth = 7;
+}
+
+message APIDefinition {
+  string protocol = 1;
+  HTTPRequest request = 2;
+  string description = 3;
+  google.protobuf.Struct schema = 4;
+}
+
+message Operation {
+  string type = 1;
+  int32 version = 2;
+  string script = 3;
+  string source = 4;
+}
+
+message Assertion {
+  string source = 1;
+  string path = 2;
+  string operator = 3;
+  google.protobuf.Value expected = 4;
+}
+
+message Extraction {
+  string source = 1;
+  string path = 2;
+  string variable = 3;
+  bool secret = 4;
+}
+
+message TestCaseDefinition {
+  string api_id = 1;
+  string name = 2;
+  HTTPRequest request = 3;
+  RequestPatch override = 4;
+  map<string,string> variables = 5;
+  map<string,string> collection_variables = 6;
+  repeated Operation before = 7;
+  repeated Operation after = 8;
+  repeated Assertion assertions = 9;
+  repeated Extraction extractions = 10;
+}
+
+message ScenarioStep {
+  string id = 1;
+  string name = 2;
+  string case_id = 3;
+  TestCaseDefinition inline = 4;
+  RequestPatch override = 5;
+  map<string,string> variables = 6;
+  bool continue_on_failure = 7;
+}
+
+message ScenarioDefinition {
+  string name = 1;
+  repeated ScenarioStep steps = 2;
+  map<string,string> collection_variables = 3;
+}
+
+message EnvironmentDefinition {
+  map<string,Variable> variables = 1;
+}
+
+message FolderDefinition {
+  string kind = 1;
+}
+
+message Selection {
+  string kind = 1;
+  string id = 2;
+}
+
+message TaskDefinition {
+  repeated Selection items = 1;
+  string environment_id = 2;
+  string runner_id = 3;
+  int32 timeout_seconds = 4;
+}
+
+message CompiledStep {
+  string id = 1;
+  string name = 2;
+  TestCaseDefinition case = 3;
+  bool continue_on_failure = 4;
+}
+
+message CompiledItem {
+  string id = 1;
+  string name = 2;
+  repeated CompiledStep steps = 3;
+  map<string,string> collection_variables = 4;
+}
+
+message Snapshot {
+  int32 version = 1;
+  string org_id = 2;
+  string project_id = 3;
+  EnvironmentDefinition environment = 4;
+  repeated CompiledItem items = 5;
+  map<string,int64> revisions = 6;
+  int32 timeout_seconds = 7;
+}
+
+message HeaderValues {
+  repeated string values = 1;
+}
+
+message HTTPResponse {
+  int32 status = 1;
+  map<string,HeaderValues> headers = 2;
+  string body = 3;
+  int64 duration_ms = 4;
+  string error = 5;
+  bool truncated = 6;
+}
+
+message AssertionResult {
+  string name = 1;
+  bool passed = 2;
+  string message = 3;
+}
+
+message StepResult {
+  string id = 1;
+  string name = 2;
+  string status = 3;
+  HTTPRequest request = 4;
+  HTTPResponse response = 5;
+  repeated AssertionResult assertions = 6;
+  repeated string logs = 7;
+  string error = 8;
+  int64 duration_ms = 9;
+}
+
+message ItemResult {
+  string id = 1;
+  string name = 2;
+  string status = 3;
+  repeated StepResult steps = 4;
+}
+
+message ExecutionResult {
+  string status = 1;
+  repeated ItemResult items = 2;
+  string error = 3;
+  int64 duration_ms = 4;
+}
+
+message MockCondition {
+  string source = 1;
+  string path = 2;
+  string operator = 3;
+  google.protobuf.Value expected = 4;
+}
+
+message MockResponse {
+  repeated MockCondition conditions = 1;
+  int32 status = 2;
+  map<string,string> headers = 3;
+  string body = 4;
+  int32 delay_ms = 5;
+}

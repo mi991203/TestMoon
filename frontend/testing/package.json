@@ -1,0 +1,30 @@
+{
+  "name": "@testmoon/testing",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit && vite build"
+  },
+  "dependencies": {
+    "@testmoon/web": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "antd": "catalog:",
+    "@ant-design/icons": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "react-router-dom": "catalog:",
+    "@monaco-editor/react": "catalog:",
+    "monaco-editor": "catalog:",
+    "@testmoon/api": "workspace:*"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "catalog:",
+    "vite": "catalog:",
+    "typescript": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@types/node": "catalog:"
+  }
+}

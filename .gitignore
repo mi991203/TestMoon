@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.tools/
+.local/
+.cache/
+deploy/local/.env
+*.log
+.DS_Store
+
+.pnpm-store/

@@ -1,0 +1,15 @@
+name: testmoon-runner
+services:
+  runner:
+    image: testmoon/runner:0.1.0
+    restart: unless-stopped
+    environment:
+      TESTMOON_URL: ${TESTMOON_URL:?HTTPS platform origin required}
+      TESTMOON_ENROLLMENT_TOKEN: ${TESTMOON_ENROLLMENT_TOKEN:-}
+      TESTMOON_WORKER_IMAGE: ${TESTMOON_WORKER_IMAGE:-testmoon/worker:0.1.0}
+      TESTMOON_RUNNER_STATE: /var/lib/testmoon/runner.json
+    volumes:
+      - runner-state:/var/lib/testmoon
+      - /var/run/docker.sock:/var/run/docker.sock
+volumes:
+  runner-state:
