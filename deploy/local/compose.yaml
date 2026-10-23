@@ -1,4 +1,29 @@
 name: testmoon
+x-app: &app
+  image: testmoon/app:0.1.0
+  build:
+    context: ../..
+    dockerfile: deploy/local/app.Dockerfile
+  restart: unless-stopped
+  stop_grace_period: 30s
+x-app-env: &app-env
+  TESTMOON_SERVICE_KEY: ${TESTMOON_SERVICE_KEY:?required}
+  TESTMOON_ENCRYPTION_KEY: ${TESTMOON_ENCRYPTION_KEY:?required}
+  TESTMOON_REDIS: redis:6379
+  TESTMOON_REDIS_PASSWORD: ${REDIS_PASSWORD:?required}
+  TESTMOON_KAFKA: kafka:9092
+  TESTMOON_IDENTITY: identity:9091
+  TESTMOON_CORE: core:9092
+  TESTMOON_EXECUTION: execution:9093
+  TESTMOON_MOCK: mock:9094
+  TESTMOON_WEB_ORIGIN: http://localhost:${GATEWAY_PORT:-18080}
+  TESTMOON_MOCK_HOST: mock.localhost
+  TESTMOON_SECURE_COOKIE: "false"
+x-health: &health
+  interval: 5s
+  timeout: 3s
+  retries: 30
+  start_period: 20s
 services:
   mysql:
     image: mysql:8.4.11@sha256:0f51e63e537a1f176423fa03ef559aabe6fa4372a53160a44bc7e75da7d15364
@@ -6,6 +31,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?run scripts/infra.sh up}
       MYSQL_USER: testmoon
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:?required}
+      MYSQL_ROOT_HOST: "%"
     ports: ["127.0.0.1:${MYSQL_PORT:-13306}:3306"]
     volumes: [mysql-data:/var/lib/mysql]
     healthcheck:
@@ -24,6 +50,94 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
+  db-init:
+    image: mysql:8.4.11@sha256:0f51e63e537a1f176423fa03ef559aabe6fa4372a53160a44bc7e75da7d15364
+    entrypoint: [sh, /init/init-databases.sh]
+    environment:
+      MYSQL_PWD: ${MYSQL_ROOT_PASSWORD:?required}
+    volumes:
+      - ./mysql:/init:ro
+    depends_on:
+      mysql: {condition: service_healthy}
+    restart: "no"
+  identity:
+    <<: *app
+    command: [/app/bin/identity]
+    environment:
+      <<: *app-env
+      TESTMOON_IDENTITY_HTTP: 0.0.0.0:8091
+      TESTMOON_IDENTITY_GRPC: 0.0.0.0:9091
+      TESTMOON_IDENTITY_DSN: testmoon:${MYSQL_PASSWORD:?required}@tcp(mysql:3306)/testmoon_identity?charset=utf8mb4&parseTime=True&loc=UTC
+      TESTMOON_BOOTSTRAP_USERNAME: ${TESTMOON_BOOTSTRAP_USERNAME:?required}
+      TESTMOON_BOOTSTRAP_PASSWORD: ${TESTMOON_BOOTSTRAP_PASSWORD:?required}
+    depends_on:
+      db-init: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+    healthcheck:
+      <<: *health
+      test: [CMD, curl, -fsS, --max-time, "2", http://127.0.0.1:8091/healthz]
+  core:
+    <<: *app
+    command: [/app/bin/core]
+    environment:
+      <<: *app-env
+      TESTMOON_CORE_HTTP: 0.0.0.0:8092
+      TESTMOON_CORE_GRPC: 0.0.0.0:9092
+      TESTMOON_CORE_DSN: testmoon:${MYSQL_PASSWORD:?required}@tcp(mysql:3306)/testmoon_core?charset=utf8mb4&parseTime=True&loc=UTC
+    depends_on:
+      db-init: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+    healthcheck:
+      <<: *health
+      test: [CMD, curl, -fsS, --max-time, "2", http://127.0.0.1:8092/healthz]
+  execution:
+    <<: *app
+    command: [/app/bin/execution]
+    environment:
+      <<: *app-env
+      TESTMOON_EXECUTION_HTTP: 0.0.0.0:8093
+      TESTMOON_EXECUTION_GRPC: 0.0.0.0:9093
+      TESTMOON_EXECUTION_DSN: testmoon:${MYSQL_PASSWORD:?required}@tcp(mysql:3306)/testmoon_execution?charset=utf8mb4&parseTime=True&loc=UTC
+    depends_on:
+      db-init: {condition: service_completed_successfully}
+      kafka: {condition: service_healthy}
+    healthcheck:
+      <<: *health
+      test: [CMD, curl, -fsS, --max-time, "2", http://127.0.0.1:8093/healthz]
+  mock:
+    <<: *app
+    command: [/app/bin/mock]
+    environment:
+      <<: *app-env
+      TESTMOON_MOCK_HTTP: 0.0.0.0:8094
+      TESTMOON_MOCK_GRPC: 0.0.0.0:9094
+      TESTMOON_MOCK_PUBLIC_HTTP: 0.0.0.0:8095
+      TESTMOON_MOCK_DSN: testmoon:${MYSQL_PASSWORD:?required}@tcp(mysql:3306)/testmoon_mock?charset=utf8mb4&parseTime=True&loc=UTC
+    depends_on:
+      db-init: {condition: service_completed_successfully}
+    healthcheck:
+      <<: *health
+      test: [CMD, curl, -fsS, --max-time, "2", http://127.0.0.1:8094/healthz]
+  gateway:
+    <<: *app
+    command: [/app/bin/gateway]
+    environment:
+      <<: *app-env
+      TESTMOON_GATEWAY_HTTP: 0.0.0.0:18080
+      TESTMOON_IDENTITY_HTTP: identity:8091
+      TESTMOON_CORE_HTTP: core:8092
+      TESTMOON_EXECUTION_HTTP: execution:8093
+      TESTMOON_MOCK_HTTP: mock:8094
+      TESTMOON_MOCK_PUBLIC_HTTP: mock:8095
+    ports: ["127.0.0.1:${GATEWAY_PORT:-18080}:18080"]
+    depends_on:
+      identity: {condition: service_healthy}
+      core: {condition: service_healthy}
+      execution: {condition: service_healthy}
+      mock: {condition: service_healthy}
+    healthcheck:
+      <<: *health
+      test: [CMD, curl, -fsS, --max-time, "2", http://127.0.0.1:18080/healthz]
   kafka:
     image: apache/kafka:4.3.1@sha256:77e3df9054047a88b520d0cc46e16696d3b22022e1d580aeccd2632df6532837
     ports: ["127.0.0.1:${KAFKA_PORT:-19092}:19092"]

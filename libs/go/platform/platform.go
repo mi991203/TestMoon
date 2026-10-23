@@ -406,7 +406,7 @@ func Serve(c Config, register func(*grpc.Server), gateway func(context.Context, 
 			panic(e)
 		}
 	}
-	if e = gateway(ctx, mux, c.GRPC, []grpc.DialOption{grpc.WithTransportCredentials(tc), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(16 << 20))}); e != nil {
+	if e = gateway(ctx, mux, localGRPCEndpoint(c.GRPC), []grpc.DialOption{grpc.WithTransportCredentials(tc), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(16 << 20))}); e != nil {
 		panic(e)
 	}
 	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

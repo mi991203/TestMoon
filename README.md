@@ -6,7 +6,33 @@
 
 ## 本地启动
 
-需要 Go 1.27（toolchain 自动选择 1.27.3）、Node 24.22.0 LTS、pnpm 11.28.6、Docker 与 Compose v2。协议文件已生成并提交到源码目录；只有修改 proto 才需要 protoc 36.2 和生成插件。
+推荐使用 Docker Compose 运行整个平台，本机只运行私有 Runner。需要 Docker、Compose v2+、Python 3 和 Go 1.27（toolchain 自动选择 1.27.3）；Node、pnpm 和前端均在镜像内构建。
+
+从原本机进程部署迁移时，先执行 `./scripts/dev.sh stop`，并停止原先手动运行的 Runner。保留 `deploy/local/.env`、`.local/runner.json` 和已有数据卷；平台地址继续使用 `http://localhost:18080`，无需重新注册节点。
+
+```bash
+./scripts/local-prepare.sh  # 首次：准备私有配置、Worker镜像、本机Runner
+docker compose --env-file deploy/local/.env -f deploy/local/compose.yaml up -d --build --wait
+./scripts/runner.sh start
+```
+
+第一次使用 Runner，需要先在界面创建私有节点，将一次性凭证通过 `TESTMOON_ENROLLMENT_TOKEN` 环境变量传给启动脚本；已有 `.local/runner.json` 时不需要凭证。
+
+```bash
+docker compose --env-file deploy/local/.env -f deploy/local/compose.yaml ps
+docker compose --env-file deploy/local/.env -f deploy/local/compose.yaml logs --tail 100 gateway execution
+./scripts/runner.sh status
+./scripts/runner.sh stop
+docker compose --env-file deploy/local/.env -f deploy/local/compose.yaml stop
+```
+
+日常启动可省略 `--build`；修改平台代码后重新执行带 `--build` 的启动命令。修改 Runner/Worker 后重跑准备命令并重启 Runner。`stop` 保留容器，`down` 删除容器及网络但保留数据卷。停机前等待任务结束，先停 Runner 再停平台；平台停止期间，Runner 持续心跳失败会退出，平台恢复后需再次启动 Runner。
+
+Compose 内的服务通过服务名访问，网关发布到本机 `18080`；本机 Runner 经此入口连接平台，并使用本机网络访问被测 API。Worker 仍按执行创建且没有直接网络。VPN 需提供本机可用的 DNS/直连路由；Runner 当前不使用系统 HTTP 代理。
+
+### 本机源码开发
+
+原有开发方式仍保留，与 Compose 应用部署二选一，避免端口冲突。需要额外安装 Node 24.22.0 LTS、pnpm 11.28.6。协议文件已生成并提交；只有修改 proto 才需要 protoc 36.2 和生成插件。
 
 ```bash
 make deps
@@ -24,7 +50,7 @@ make dev
 
 ```bash
 make stop              # 停止本仓库脚本启动的业务服务
-make infra-down        # 停止中间件，保留数据卷
+make infra-down        # 停止此Compose项目（包括已启动的应用），保留数据卷
 ./scripts/infra.sh up mysql redis  # 可只启动需要的中间件
 ./scripts/dev.sh status
 ```
@@ -82,4 +108,4 @@ make build-web
 - [部署配置](docs/architecture/部署配置.md)：端口、配置优先级、限额和生产部署条件。
 - [实现与验证记录](docs/requirements/delivery.md)：已验证路径及未验证范围。
 
-按当前要求未新增单元测试。当前构建使用原生工具与 Makefile，未引入 Bazel 或 CI。
+平台支持 Compose 镜像构建，也保留原生工具与 Makefile 开发入口，未引入 Bazel 或 CI。
