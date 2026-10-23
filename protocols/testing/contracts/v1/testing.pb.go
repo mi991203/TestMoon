@@ -789,8 +789,11 @@ type ScenarioStep struct {
 	Override          *RequestPatch          `protobuf:"bytes,5,opt,name=override,proto3" json:"override,omitempty"`
 	Variables         map[string]string      `protobuf:"bytes,6,rep,name=variables,proto3" json:"variables,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	ContinueOnFailure bool                   `protobuf:"varint,7,opt,name=continue_on_failure,json=continueOnFailure,proto3" json:"continue_on_failure,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// folder nodes only group children; request steps are leaves.
+	Kind          string          `protobuf:"bytes,8,opt,name=kind,proto3" json:"kind,omitempty"`
+	Children      []*ScenarioStep `protobuf:"bytes,9,rep,name=children,proto3" json:"children,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ScenarioStep) Reset() {
@@ -870,6 +873,20 @@ func (x *ScenarioStep) GetContinueOnFailure() bool {
 		return x.ContinueOnFailure
 	}
 	return false
+}
+
+func (x *ScenarioStep) GetKind() string {
+	if x != nil {
+		return x.Kind
+	}
+	return ""
+}
+
+func (x *ScenarioStep) GetChildren() []*ScenarioStep {
+	if x != nil {
+		return x.Children
+	}
+	return nil
 }
 
 type ScenarioDefinition struct {
@@ -1024,6 +1041,9 @@ type Selection struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Kind          string                 `protobuf:"bytes,1,opt,name=kind,proto3" json:"kind,omitempty"`
 	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	NodeId        string                 `protobuf:"bytes,3,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	Children      []*Selection           `protobuf:"bytes,5,rep,name=children,proto3" json:"children,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1070,6 +1090,27 @@ func (x *Selection) GetId() string {
 		return x.Id
 	}
 	return ""
+}
+
+func (x *Selection) GetNodeId() string {
+	if x != nil {
+		return x.NodeId
+	}
+	return ""
+}
+
+func (x *Selection) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Selection) GetChildren() []*Selection {
+	if x != nil {
+		return x.Children
+	}
+	return nil
 }
 
 type TaskDefinition struct {
@@ -2041,7 +2082,7 @@ const file_protocols_testing_contracts_v1_testing_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +
 	"\x18CollectionVariablesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xa7\x03\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x84\x04\n" +
 	"\fScenarioStep\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x17\n" +
@@ -2049,7 +2090,9 @@ const file_protocols_testing_contracts_v1_testing_proto_rawDesc = "" +
 	"\x06inline\x18\x04 \x01(\v21.testmoon.testing.contracts.v1.TestCaseDefinitionR\x06inline\x12G\n" +
 	"\boverride\x18\x05 \x01(\v2+.testmoon.testing.contracts.v1.RequestPatchR\boverride\x12X\n" +
 	"\tvariables\x18\x06 \x03(\v2:.testmoon.testing.contracts.v1.ScenarioStep.VariablesEntryR\tvariables\x12.\n" +
-	"\x13continue_on_failure\x18\a \x01(\bR\x11continueOnFailure\x1a<\n" +
+	"\x13continue_on_failure\x18\a \x01(\bR\x11continueOnFailure\x12\x12\n" +
+	"\x04kind\x18\b \x01(\tR\x04kind\x12G\n" +
+	"\bchildren\x18\t \x03(\v2+.testmoon.testing.contracts.v1.ScenarioStepR\bchildren\x1a<\n" +
 	"\x0eVariablesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xb2\x02\n" +
@@ -2066,10 +2109,13 @@ const file_protocols_testing_contracts_v1_testing_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12=\n" +
 	"\x05value\x18\x02 \x01(\v2'.testmoon.testing.contracts.v1.VariableR\x05value:\x028\x01\"&\n" +
 	"\x10FolderDefinition\x12\x12\n" +
-	"\x04kind\x18\x01 \x01(\tR\x04kind\"/\n" +
+	"\x04kind\x18\x01 \x01(\tR\x04kind\"\xa2\x01\n" +
 	"\tSelection\x12\x12\n" +
 	"\x04kind\x18\x01 \x01(\tR\x04kind\x12\x0e\n" +
-	"\x02id\x18\x02 \x01(\tR\x02id\"\xbd\x01\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\x12\x17\n" +
+	"\anode_id\x18\x03 \x01(\tR\x06nodeId\x12\x12\n" +
+	"\x04name\x18\x04 \x01(\tR\x04name\x12D\n" +
+	"\bchildren\x18\x05 \x03(\v2(.testmoon.testing.contracts.v1.SelectionR\bchildren\"\xbd\x01\n" +
 	"\x0eTaskDefinition\x12>\n" +
 	"\x05items\x18\x01 \x03(\v2(.testmoon.testing.contracts.v1.SelectionR\x05items\x12%\n" +
 	"\x0eenvironment_id\x18\x02 \x01(\tR\renvironmentId\x12\x1b\n" +
@@ -2237,32 +2283,34 @@ var file_protocols_testing_contracts_v1_testing_proto_depIdxs = []int32{
 	8,  // 17: testmoon.testing.contracts.v1.ScenarioStep.inline:type_name -> testmoon.testing.contracts.v1.TestCaseDefinition
 	3,  // 18: testmoon.testing.contracts.v1.ScenarioStep.override:type_name -> testmoon.testing.contracts.v1.RequestPatch
 	32, // 19: testmoon.testing.contracts.v1.ScenarioStep.variables:type_name -> testmoon.testing.contracts.v1.ScenarioStep.VariablesEntry
-	9,  // 20: testmoon.testing.contracts.v1.ScenarioDefinition.steps:type_name -> testmoon.testing.contracts.v1.ScenarioStep
-	33, // 21: testmoon.testing.contracts.v1.ScenarioDefinition.collection_variables:type_name -> testmoon.testing.contracts.v1.ScenarioDefinition.CollectionVariablesEntry
-	34, // 22: testmoon.testing.contracts.v1.EnvironmentDefinition.variables:type_name -> testmoon.testing.contracts.v1.EnvironmentDefinition.VariablesEntry
-	13, // 23: testmoon.testing.contracts.v1.TaskDefinition.items:type_name -> testmoon.testing.contracts.v1.Selection
-	8,  // 24: testmoon.testing.contracts.v1.CompiledStep.case:type_name -> testmoon.testing.contracts.v1.TestCaseDefinition
-	15, // 25: testmoon.testing.contracts.v1.CompiledItem.steps:type_name -> testmoon.testing.contracts.v1.CompiledStep
-	35, // 26: testmoon.testing.contracts.v1.CompiledItem.collection_variables:type_name -> testmoon.testing.contracts.v1.CompiledItem.CollectionVariablesEntry
-	11, // 27: testmoon.testing.contracts.v1.Snapshot.environment:type_name -> testmoon.testing.contracts.v1.EnvironmentDefinition
-	16, // 28: testmoon.testing.contracts.v1.Snapshot.items:type_name -> testmoon.testing.contracts.v1.CompiledItem
-	36, // 29: testmoon.testing.contracts.v1.Snapshot.revisions:type_name -> testmoon.testing.contracts.v1.Snapshot.RevisionsEntry
-	37, // 30: testmoon.testing.contracts.v1.HTTPResponse.headers:type_name -> testmoon.testing.contracts.v1.HTTPResponse.HeadersEntry
-	2,  // 31: testmoon.testing.contracts.v1.StepResult.request:type_name -> testmoon.testing.contracts.v1.HTTPRequest
-	19, // 32: testmoon.testing.contracts.v1.StepResult.response:type_name -> testmoon.testing.contracts.v1.HTTPResponse
-	20, // 33: testmoon.testing.contracts.v1.StepResult.assertions:type_name -> testmoon.testing.contracts.v1.AssertionResult
-	21, // 34: testmoon.testing.contracts.v1.ItemResult.steps:type_name -> testmoon.testing.contracts.v1.StepResult
-	22, // 35: testmoon.testing.contracts.v1.ExecutionResult.items:type_name -> testmoon.testing.contracts.v1.ItemResult
-	40, // 36: testmoon.testing.contracts.v1.MockCondition.expected:type_name -> google.protobuf.Value
-	24, // 37: testmoon.testing.contracts.v1.MockResponse.conditions:type_name -> testmoon.testing.contracts.v1.MockCondition
-	38, // 38: testmoon.testing.contracts.v1.MockResponse.headers:type_name -> testmoon.testing.contracts.v1.MockResponse.HeadersEntry
-	0,  // 39: testmoon.testing.contracts.v1.EnvironmentDefinition.VariablesEntry.value:type_name -> testmoon.testing.contracts.v1.Variable
-	18, // 40: testmoon.testing.contracts.v1.HTTPResponse.HeadersEntry.value:type_name -> testmoon.testing.contracts.v1.HeaderValues
-	41, // [41:41] is the sub-list for method output_type
-	41, // [41:41] is the sub-list for method input_type
-	41, // [41:41] is the sub-list for extension type_name
-	41, // [41:41] is the sub-list for extension extendee
-	0,  // [0:41] is the sub-list for field type_name
+	9,  // 20: testmoon.testing.contracts.v1.ScenarioStep.children:type_name -> testmoon.testing.contracts.v1.ScenarioStep
+	9,  // 21: testmoon.testing.contracts.v1.ScenarioDefinition.steps:type_name -> testmoon.testing.contracts.v1.ScenarioStep
+	33, // 22: testmoon.testing.contracts.v1.ScenarioDefinition.collection_variables:type_name -> testmoon.testing.contracts.v1.ScenarioDefinition.CollectionVariablesEntry
+	34, // 23: testmoon.testing.contracts.v1.EnvironmentDefinition.variables:type_name -> testmoon.testing.contracts.v1.EnvironmentDefinition.VariablesEntry
+	13, // 24: testmoon.testing.contracts.v1.Selection.children:type_name -> testmoon.testing.contracts.v1.Selection
+	13, // 25: testmoon.testing.contracts.v1.TaskDefinition.items:type_name -> testmoon.testing.contracts.v1.Selection
+	8,  // 26: testmoon.testing.contracts.v1.CompiledStep.case:type_name -> testmoon.testing.contracts.v1.TestCaseDefinition
+	15, // 27: testmoon.testing.contracts.v1.CompiledItem.steps:type_name -> testmoon.testing.contracts.v1.CompiledStep
+	35, // 28: testmoon.testing.contracts.v1.CompiledItem.collection_variables:type_name -> testmoon.testing.contracts.v1.CompiledItem.CollectionVariablesEntry
+	11, // 29: testmoon.testing.contracts.v1.Snapshot.environment:type_name -> testmoon.testing.contracts.v1.EnvironmentDefinition
+	16, // 30: testmoon.testing.contracts.v1.Snapshot.items:type_name -> testmoon.testing.contracts.v1.CompiledItem
+	36, // 31: testmoon.testing.contracts.v1.Snapshot.revisions:type_name -> testmoon.testing.contracts.v1.Snapshot.RevisionsEntry
+	37, // 32: testmoon.testing.contracts.v1.HTTPResponse.headers:type_name -> testmoon.testing.contracts.v1.HTTPResponse.HeadersEntry
+	2,  // 33: testmoon.testing.contracts.v1.StepResult.request:type_name -> testmoon.testing.contracts.v1.HTTPRequest
+	19, // 34: testmoon.testing.contracts.v1.StepResult.response:type_name -> testmoon.testing.contracts.v1.HTTPResponse
+	20, // 35: testmoon.testing.contracts.v1.StepResult.assertions:type_name -> testmoon.testing.contracts.v1.AssertionResult
+	21, // 36: testmoon.testing.contracts.v1.ItemResult.steps:type_name -> testmoon.testing.contracts.v1.StepResult
+	22, // 37: testmoon.testing.contracts.v1.ExecutionResult.items:type_name -> testmoon.testing.contracts.v1.ItemResult
+	40, // 38: testmoon.testing.contracts.v1.MockCondition.expected:type_name -> google.protobuf.Value
+	24, // 39: testmoon.testing.contracts.v1.MockResponse.conditions:type_name -> testmoon.testing.contracts.v1.MockCondition
+	38, // 40: testmoon.testing.contracts.v1.MockResponse.headers:type_name -> testmoon.testing.contracts.v1.MockResponse.HeadersEntry
+	0,  // 41: testmoon.testing.contracts.v1.EnvironmentDefinition.VariablesEntry.value:type_name -> testmoon.testing.contracts.v1.Variable
+	18, // 42: testmoon.testing.contracts.v1.HTTPResponse.HeadersEntry.value:type_name -> testmoon.testing.contracts.v1.HeaderValues
+	43, // [43:43] is the sub-list for method output_type
+	43, // [43:43] is the sub-list for method input_type
+	43, // [43:43] is the sub-list for extension type_name
+	43, // [43:43] is the sub-list for extension extendee
+	0,  // [0:43] is the sub-list for field type_name
 }
 
 func init() { file_protocols_testing_contracts_v1_testing_proto_init() }

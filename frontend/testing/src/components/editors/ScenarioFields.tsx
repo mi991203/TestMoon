@@ -2,9 +2,8 @@ import type { ScenarioDraft } from "../../models/editors";
 import type { Asset } from "../../models/resources";
 import type { StepDraft } from "../../models/editors";
 import { RequestFields } from "./RequestFields";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
-  Button,
   Checkbox,
   Input,
   Modal,
@@ -15,7 +14,8 @@ import {
 import { Pairs } from "@testmoon/web";
 import { blankRequest, requestPatch, hasRequestPatch } from "./defaults";
 import { CaseFields } from "./CaseFields";
-import { TagIndex } from "./TagIndex";
+import { OrchestrationTree } from "../orchestration/OrchestrationTree";
+import { insertNode, updateNode } from "../orchestration/tree";
 export function ScenarioFields({
   value,
   onChange,
@@ -29,97 +29,58 @@ export function ScenarioFields({
   apis: Asset<"api">[];
   readOnly?: boolean;
 }) {
-  const steps: StepDraft[] = value.steps || [];
-  const [index, setIndex] = useState<number | null>(null);
+  const steps = useMemo(() => {
+    const normalize = (nodes: StepDraft[]): StepDraft[] => nodes.map((node) => ({
+      ...node, id: node.id || crypto.randomUUID(),
+      ...(node.kind === "folder" ? { children: normalize(node.children || []) } : {}),
+    }));
+    return normalize(value.steps || []);
+  }, [value.steps]);
+  const [editing, setEditing] = useState<{ key?: string; parent: string }>();
+  const [stepType, setStepType] = useState("inline");
   const [step, setStep] = useState<StepDraft>({});
   const [over, setOver] = useState(false);
-  function edit(i: number) {
-    const v = structuredClone(steps[i]);
+  function edit(node: StepDraft) {
+    const v = structuredClone(node);
     setStep(v);
+    setStepType(v.case_id ? "reference" : "inline");
     setOver(hasRequestPatch(v.override));
-    setIndex(i);
+    setEditing({ key: v.id, parent: "" });
   }
   return (
     <>
       <Typography.Paragraph type="secondary">
-        步骤按顺序执行。默认失败停止当前场景，可对单步配置失败后继续。
+        默认失败停止当前场景，可对单步配置失败后继续。
       </Typography.Paragraph>
-      {steps.map((st, i) => (
-        <div className="step-card" key={st.id || i}>
-          <Space>
-            <TagIndex index={i} />
-            <span>
-              {st.name ||
-                cases.find((v) => v.id === st.case_id)?.name ||
-                "独立请求"}
-            </span>
-            {st.continue_on_failure && (
-              <Typography.Text type="secondary">失败后继续</Typography.Text>
-            )}
-          </Space>
-          <Space>
-            <Button onClick={() => edit(i)}>
-              {readOnly ? "查看" : "编辑"}
-            </Button>
-            {!readOnly && (
-              <>
-                <Button
-                  disabled={!i}
-                  onClick={() => {
-                    const next = [...steps];
-                    [next[i - 1], next[i]] = [next[i], next[i - 1]];
-                    onChange({ ...value, steps: next });
-                  }}
-                >
-                  上移
-                </Button>
-                <Button
-                  danger
-                  onClick={() =>
-                    onChange({
-                      ...value,
-                      steps: steps.filter((_, j) => j !== i),
-                    })
-                  }
-                >
-                  删除
-                </Button>
-              </>
-            )}
-          </Space>
-        </div>
-      ))}
-      {!readOnly && (
-        <Button
-          type="dashed"
-          block
-          onClick={() => {
-            setStep({
-              id: crypto.randomUUID(),
-              name: "",
-              case_id: "",
-              inline: { request: blankRequest() },
-            });
-            setOver(false);
-            setIndex(steps.length);
-          }}
-        >
-          添加步骤
-        </Button>
-      )}
+      <OrchestrationTree
+        value={steps}
+        onChange={(steps) => onChange({ ...value, steps })}
+        readOnly={readOnly}
+        title={(st) => (st.name || cases.find((v) => v.id === st.case_id)?.name || "独立请求") + (st.continue_on_failure ? " · 失败后继续" : "")}
+        createFolder={(name) => ({ id: crypto.randomUUID(), kind: "folder", name, children: [] })}
+        onEdit={edit}
+        addLabel="添加步骤"
+        onAdd={(parent) => {
+          setStep({ id: crypto.randomUUID(), kind: "step", name: "", inline: { request: blankRequest() } });
+          setStepType("inline");
+          setOver(false);
+          setEditing({ parent });
+        }}
+      />
       <Modal
         width={1000}
         title="场景步骤"
-        open={index !== null}
-        onCancel={() => setIndex(null)}
+        open={!!editing}
+        onCancel={() => setEditing(undefined)}
         onOk={() => {
-          if (index === null) return;
-          const next = [...steps];
-          next[index] = step;
+          if (!editing) return;
+          const next = editing.key
+            ? updateNode(steps, editing.key, () => step)
+            : insertNode(steps, editing.parent, step);
           onChange({ ...value, steps: next });
-          setIndex(null);
+          setEditing(undefined);
         }}
-        okButtonProps={{ disabled: readOnly }}
+        okButtonProps={{ disabled: readOnly || (stepType === "reference" && !step.case_id) }}
         destroyOnHidden
       >
         <Space direction="vertical" style={{ width: "100%" }}>
@@ -132,12 +93,13 @@ export function ScenarioFields({
           <Select
             disabled={readOnly}
             style={{ width: 250 }}
-            value={step.case_id ? "reference" : "inline"}
+            value={stepType}
             options={[
               { value: "reference", label: "引用已有接口用例" },
               { value: "inline", label: "场景内独立请求" },
             ]}
-            onChange={(type) =>
+            onChange={(type) => {
+              setStepType(type);
               setStep(
                 type === "inline"
                   ? {
@@ -146,15 +108,18 @@ export function ScenarioFields({
                       inline: { request: blankRequest() },
                     }
                   : { ...step, case_id: cases[0]?.id || "", inline: undefined },
-              )
-            }
+              );
+            }}
           />
-          {step.case_id ? (
+          {stepType === "reference" ? (
             <>
               <Select
                 disabled={readOnly}
                 style={{ width: "100%" }}
-                value={step.case_id}
+                showSearch
+                optionFilterProp="label"
+                placeholder="选择接口用例"
+                value={step.case_id || undefined}
                 options={cases.map((v) => ({ value: v.id, label: v.name }))}
                 onChange={(case_id) => setStep({ ...step, case_id })}
               />
@@ -180,7 +145,7 @@ export function ScenarioFields({
             </>
           ) : (
             <CaseFields
-              key={index}
+              key={step.id}
               value={step.inline || { request: blankRequest() }}
               inline
               apis={apis}
@@ -190,7 +155,7 @@ export function ScenarioFields({
           )}
           <div className="form-section">步骤变量</div>
           <Pairs
-            key={`vars-${index}`}
+            key={`vars-${step.id}`}
             value={step.variables}
             readOnly={readOnly}
             onChange={(variables) => setStep({ ...step, variables })}

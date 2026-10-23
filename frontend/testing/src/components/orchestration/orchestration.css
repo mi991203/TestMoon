@@ -1,0 +1,5 @@
+.orchestration { width: 100%; }
+.orchestration-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0; }
+.orchestration-body { padding: 12px; border: 1px solid var(--ant-color-border, #d9d9d9); border-radius: 8px; min-height: 128px; margin-bottom: 12px; }
+.orchestration-body .ant-tree-treenode { padding-block: 4px; }
+.orchestration-body .ant-tag { margin-inline-end: 0; min-width: 28px; text-align: center; }

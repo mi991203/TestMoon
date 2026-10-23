@@ -27,8 +27,8 @@ export type CaseDraft = Partial<
   Omit<ContractsTestCaseDefinition, "request" | "override">
 > & { request?: RequestDraft; override?: PatchDraft };
 export type StepDraft = Partial<
-  Omit<ContractsScenarioStep, "inline" | "override">
-> & { inline?: CaseDraft; override?: PatchDraft };
+  Omit<ContractsScenarioStep, "inline" | "override" | "children">
+> & { inline?: CaseDraft; override?: PatchDraft; children?: StepDraft[] };
 export type ScenarioDraft = Partial<
   Omit<ContractsScenarioDefinition, "steps">
 > & { steps?: StepDraft[] };

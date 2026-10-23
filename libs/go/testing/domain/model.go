@@ -113,6 +113,8 @@ type Case struct {
 	RunnerID            string            `json:"runner_id"`
 }
 type Step struct {
+	Kind              string            `json:"kind,omitempty"`
+	Children          []Step            `json:"children,omitempty"`
 	ID                string            `json:"id"`
 	Name              string            `json:"name"`
 	CaseID            string            `json:"case_id"`
@@ -127,8 +129,11 @@ type Scenario struct {
 	CollectionVariables map[string]string `json:"collection_variables"`
 }
 type Selection struct {
-	Kind string `json:"kind"`
-	ID   string `json:"id"`
+	Kind     string      `json:"kind"`
+	ID       string      `json:"id"`
+	NodeID   string      `json:"node_id,omitempty"`
+	Name     string      `json:"name,omitempty"`
+	Children []Selection `json:"children,omitempty"`
 }
 type Task struct {
 	Items          []Selection `json:"items"`
