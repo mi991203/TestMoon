@@ -93,6 +93,9 @@ message ScenarioStep {
   RequestPatch override = 5;
   map<string,string> variables = 6;
   bool continue_on_failure = 7;
+  // folder nodes only group children; request steps are leaves.
+  string kind = 8;
+  repeated ScenarioStep children = 9;
 }
 
 message ScenarioDefinition {
@@ -112,6 +115,9 @@ message FolderDefinition {
 message Selection {
   string kind = 1;
   string id = 2;
+  string node_id = 3;
+  string name = 4;
+  repeated Selection children = 5;
 }
 
 message TaskDefinition {

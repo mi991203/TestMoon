@@ -19,6 +19,8 @@ import { ErrorState, PageHeading, Scope, useAction } from "@testmoon/web";
 import { useAssets, useRunners } from "../../hooks/queries";
 import { useParams } from "react-router-dom";
 import { useScopedNavigate } from "../../hooks/navigation";
+import { TaskItemsFields, taskNodes, type TaskNode } from "./TaskItemsFields";
+import { leafNodes } from "../../components/orchestration/tree";
 
 export function Tasks({
   scope,
@@ -56,21 +58,11 @@ export function Tasks({
         ? {
             ...row.document,
             name: row.name,
-            items: row.document!.items.map((x) => `${x.kind}:${x.id}`),
+            items: taskNodes(row.document!.items || []),
           }
-        : { runner_id: "public", timeout_seconds: 900 },
+        : { items: [], runner_id: "public", timeout_seconds: 900 },
     );
   }, [id, row?.id, row?.revision, query.isPending, form]);
-  const options = [
-    ...(cases.data?.items || []).map((v) => ({
-      value: `case:${v.id}`,
-      label: `用例 · ${v.name}`,
-    })),
-    ...(scenarios.data?.items || []).map((v) => ({
-      value: `scenario:${v.id}`,
-      label: `场景 · ${v.name}`,
-    })),
-  ];
   if (id)
     return (
       <>
@@ -112,10 +104,7 @@ export function Tasks({
                       revision: row?.revision || 0,
                       document: {
                         ...rest,
-                        items: items.map((x: string) => {
-                          const [kind, id] = x.split(":");
-                          return { kind, id };
-                        }),
+                        items,
                       },
                     },
                     row?.id,
@@ -133,13 +122,13 @@ export function Tasks({
               </Form.Item>
               <Form.Item
                 name="items"
-                label="测试项（按选取顺序执行）"
-                rules={[{ required: true }]}
+                label="测试项编排"
+                rules={[{ validator: (_, nodes: TaskNode[]) => leafNodes(nodes || []).length ? Promise.resolve() : Promise.reject(new Error("请至少添加一个测试项")) }]}
               >
-                <Select
-                  mode="multiple"
-                  options={options}
-                  optionFilterProp="label"
+                <TaskItemsFields
+                  cases={cases.data?.items || []}
+                  scenarios={scenarios.data?.items || []}
+                  readOnly={!editable}
                 />
               </Form.Item>
               <Form.Item name="environment_id" label="环境">
@@ -175,7 +164,7 @@ export function Tasks({
     <>
       <PageHeading
         title="测试任务"
-        description="选择测试项、环境与 Runner，手动发起一次独立执行。"
+        description="通过目录树编排测试项，配置环境与 Runner 后执行。"
         extra={
           editable && (
             <Button type="primary" onClick={() => setRow({})}>
@@ -193,7 +182,7 @@ export function Tasks({
             { title: "名称", dataIndex: "name" },
             {
               title: "测试项",
-              render: (_, v) => v.document.items?.length || 0,
+              render: (_, v) => leafNodes(v.document.items || []).length,
             },
             { title: "版本", dataIndex: "revision" },
             {

@@ -1696,6 +1696,19 @@
         },
         "id": {
           "type": "string"
+        },
+        "nodeId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Selection"
+          }
         }
       }
     },

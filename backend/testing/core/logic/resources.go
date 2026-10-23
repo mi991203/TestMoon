@@ -146,10 +146,17 @@ func validateDocument(deps *runtime.Dependencies, db *gorm.DB, r *ResourceInput,
 		return validateOperations(v.After)
 	case "scenario":
 		var v m.Scenario
-		if json.Unmarshal(b, &v) != nil || len(v.Steps) == 0 || len(v.Steps) > 100 {
+		if json.Unmarshal(b, &v) != nil {
+			return p.Bad("场景格式无效")
+		}
+		steps, err := m.FlattenSteps(v.Steps)
+		if err != nil {
+			return p.Bad(err.Error())
+		}
+		if len(steps) == 0 {
 			return p.Bad("场景应包含1..100个步骤")
 		}
-		for _, st := range v.Steps {
+		for _, st := range steps {
 			if (st.CaseID == "") == (st.Inline == nil) {
 				return p.Bad("每个步骤应引用用例或包含独立请求")
 			}
@@ -228,7 +235,11 @@ func DeleteResource(ctx context.Context, deps *runtime.Dependencies, r *Resource
 				if e != nil {
 					return e
 				}
-				for _, st := range sc.Steps {
+				steps, err := m.FlattenSteps(sc.Steps)
+				if err != nil {
+					return p.Bad(err.Error())
+				}
+				for _, st := range steps {
 					if st.CaseID == a.ID || (st.Inline != nil && st.Inline.APIID == a.ID) {
 						return p.Conflict("资源仍被场景引用")
 					}

@@ -212,6 +212,8 @@ export interface ContractsScenarioStep {
   override: ContractsRequestPatch;
   variables: Record<string, string>;
   continue_on_failure: boolean;
+  kind: string;
+  children: ContractsScenarioStep[];
 }
 export interface ContractsScenarioDefinition {
   name: string;
@@ -227,6 +229,9 @@ export interface ContractsFolderDefinition {
 export interface ContractsSelection {
   kind: string;
   id: string;
+  node_id: string;
+  name: string;
+  children: ContractsSelection[];
 }
 export interface ContractsTaskDefinition {
   items: ContractsSelection[];

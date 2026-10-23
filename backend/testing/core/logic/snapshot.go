@@ -20,8 +20,9 @@ type SnapshotInput struct {
 }
 
 func BuildSnapshot(ctx context.Context, deps *runtime.Dependencies, in SnapshotInput) (m.Snapshot, error) {
-	if len(in.Items) > deps.Config.MaxItems {
-		return m.Snapshot{}, p.Bad("测试项数量超过配置限制")
+	selections, err := m.FlattenSelections(in.Items, deps.Config.MaxItems)
+	if err != nil {
+		return m.Snapshot{}, p.Bad(err.Error())
 	}
 	out := m.Snapshot{Version: 1, OrgID: in.OrgID, ProjectID: in.ProjectID, Revisions: map[string]int64{}, Environment: m.Environment{Variables: map[string]m.Variable{}}, TimeoutSeconds: in.TimeoutSeconds}
 	if out.TimeoutSeconds == 0 {
@@ -82,7 +83,7 @@ func BuildSnapshot(ctx context.Context, deps *runtime.Dependencies, in SnapshotI
 			}
 			out.Items = append(out.Items, m.CompiledItem{ID: p.NewBase().ID, Name: name, CollectionVariables: c.CollectionVariables, Steps: []m.CompiledStep{{ID: p.NewBase().ID, Name: name, Case: c}}})
 		}
-		for _, sel := range in.Items {
+		for _, sel := range selections {
 			if sel.Kind != "case" && sel.Kind != "scenario" {
 				return p.Bad("任务只支持case或scenario")
 			}
@@ -92,6 +93,9 @@ func BuildSnapshot(ctx context.Context, deps *runtime.Dependencies, in SnapshotI
 			}
 			out.Revisions[a.ID] = a.Revision
 			item := m.CompiledItem{ID: a.ID, Name: a.Name}
+			if sel.NodeID != "" {
+				item.ID = sel.NodeID
+			}
 			if sel.Kind == "case" {
 				c, e := DecodeDocument[m.Case](deps, a)
 				if e != nil {
@@ -108,11 +112,15 @@ func BuildSnapshot(ctx context.Context, deps *runtime.Dependencies, in SnapshotI
 				if e != nil {
 					return e
 				}
-				if len(sc.Steps) == 0 || len(sc.Steps) > 100 {
+				steps, err := m.FlattenSteps(sc.Steps)
+				if err != nil {
+					return p.Bad(err.Error())
+				}
+				if len(steps) == 0 {
 					return p.Bad("场景步骤数量超出限制")
 				}
 				item.CollectionVariables = sc.CollectionVariables
-				for _, step := range sc.Steps {
+				for _, step := range steps {
 					var c m.Case
 					if step.CaseID != "" {
 						a, e := LoadResource(deps, tx, in.OrgID, in.ProjectID, step.CaseID, "case")

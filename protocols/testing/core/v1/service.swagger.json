@@ -2693,6 +2693,17 @@
         },
         "continueOnFailure": {
           "type": "boolean"
+        },
+        "kind": {
+          "type": "string",
+          "description": "folder nodes only group children; request steps are leaves."
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ScenarioStep"
+          }
         }
       }
     },
@@ -2704,6 +2715,19 @@
         },
         "id": {
           "type": "string"
+        },
+        "nodeId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Selection"
+          }
         }
       }
     },
