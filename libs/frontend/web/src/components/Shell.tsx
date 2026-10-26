@@ -48,21 +48,21 @@ export function Shell({
       <Layout>
         <Layout.Header className="topbar">
           <div className="scope-controls">
-          <Space>
-            <Typography.Text type="secondary">组织空间</Typography.Text>
-            <Select
-              aria-label="当前组织"
-              style={{ width: 220 }}
-              value={org || undefined}
-              placeholder="选择组织"
-              options={(session.organizations || []).map((o) => ({
-                value: o.id,
-                label: o.name,
-              }))}
-              onChange={onOrg}
-            />
-          </Space>
-          {scopeControls}
+            <Space>
+              <Typography.Text type="secondary">组织空间</Typography.Text>
+              <Select
+                aria-label="当前组织"
+                style={{ width: 220 }}
+                value={org || undefined}
+                placeholder="选择组织"
+                options={(session.organizations || []).map((o) => ({
+                  value: o.id,
+                  label: o.name,
+                }))}
+                onChange={onOrg}
+              />
+            </Space>
+            {scopeControls}
           </div>
           <Space className="account-controls">
             <Tag>{session.principal?.username}</Tag>

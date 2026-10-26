@@ -7,18 +7,33 @@ export type ExecutionConfig = { environment_id?: string; runner_id?: string };
 export function useExecutionOptions(scope: Scope, config: ExecutionConfig) {
   const envs = useAssets(scope, "environment");
   const runners = useRunners(scope);
-  const runner = runners.data?.items.find((v) => v.id === (config.runner_id || "public"));
-  const unavailable = runners.data && !runner
-    ? "所选 Runner 已撤销或不可用，请重新选择。"
-    : runner && !runner.online
-      ? "所选 Runner 离线，请等待上线或重新选择。"
-      : config.environment_id && envs.data && !envs.data.items.some((v) => v.id === config.environment_id)
-        ? "所选环境已删除或不可用，请重新选择。"
-        : "";
-  return { envs, runners, unavailable, loading: envs.isPending || runners.isPending };
+  const runner = runners.data?.items.find(
+    (v) => v.id === (config.runner_id || "public"),
+  );
+  const unavailable =
+    runners.data && !runner
+      ? "所选 Runner 已撤销或不可用，请重新选择。"
+      : runner && !runner.online
+        ? "所选 Runner 离线，请等待上线或重新选择。"
+        : config.environment_id &&
+            envs.data &&
+            !envs.data.items.some((v) => v.id === config.environment_id)
+          ? "所选环境已删除或不可用，请重新选择。"
+          : "";
+  return {
+    envs,
+    runners,
+    unavailable,
+    loading: envs.isPending || runners.isPending,
+  };
 }
 
-export function ExecutionFields({ value, onChange, readOnly, options }: {
+export function ExecutionFields({
+  value,
+  onChange,
+  readOnly,
+  options,
+}: {
   value: ExecutionConfig;
   onChange: (value: ExecutionConfig) => void;
   readOnly: boolean;
@@ -38,8 +53,13 @@ export function ExecutionFields({ value, onChange, readOnly, options }: {
             loading={options.envs.isPending}
             value={value.environment_id || undefined}
             labelRender={({ label }) => label || "环境已不可用"}
-            options={(options.envs.data?.items || []).map((v) => ({ value: v.id, label: v.name }))}
-            onChange={(environment_id) => onChange({ ...value, environment_id: environment_id || "" })}
+            options={(options.envs.data?.items || []).map((v) => ({
+              value: v.id,
+              label: v.name,
+            }))}
+            onChange={(environment_id) =>
+              onChange({ ...value, environment_id: environment_id || "" })
+            }
           />
         </Form.Item>
         <Form.Item label="Runner">
@@ -61,7 +81,9 @@ export function ExecutionFields({ value, onChange, readOnly, options }: {
         </Form.Item>
       </div>
       <ErrorState error={options.envs.error || options.runners.error} />
-      {options.unavailable && <Alert type="warning" showIcon message={options.unavailable} />}
+      {options.unavailable && (
+        <Alert type="warning" showIcon message={options.unavailable} />
+      )}
     </>
   );
 }

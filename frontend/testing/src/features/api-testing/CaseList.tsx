@@ -26,7 +26,8 @@ export function CaseList({
   const [executionError, setExecutionError] = useState<unknown>();
   const result = useRun(scope, runId);
   const resultRef = useRef<HTMLDivElement>(null);
-  const running = !!runId && (result.isPending || active(result.data?.run.state || ""));
+  const running =
+    !!runId && (result.isPending || active(result.data?.run.state || ""));
   const go = useScopedNavigate();
   const { busy, run } = useAction();
   useEffect(() => {
@@ -34,7 +35,8 @@ export function CaseList({
     setExecutionError(undefined);
   }, [apiId, unlinked]);
   useEffect(() => {
-    if (runId) resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (runId)
+      resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [runId]);
   if (apiId && parent.isPending) return <Spin />;
   if (parent.error) return <ErrorState error={parent.error} />;
@@ -142,9 +144,15 @@ export function CaseList({
         />
       </Card>
       <ErrorState error={executionError} />
-      {runId && <div ref={resultRef} className="inline-run-result">
-        <RunResult scope={scope} id={runId} onReport={() => go(`/reports/${runId}`)} />
-      </div>}
+      {runId && (
+        <div ref={resultRef} className="inline-run-result">
+          <RunResult
+            scope={scope}
+            id={runId}
+            onReport={() => go(`/reports/${runId}`)}
+          />
+        </div>
+      )}
     </>
   );
 }

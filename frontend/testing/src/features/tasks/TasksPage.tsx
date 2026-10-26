@@ -123,7 +123,14 @@ export function Tasks({
               <Form.Item
                 name="items"
                 label="测试项编排"
-                rules={[{ validator: (_, nodes: TaskNode[]) => leafNodes(nodes || []).length ? Promise.resolve() : Promise.reject(new Error("请至少添加一个测试项")) }]}
+                rules={[
+                  {
+                    validator: (_, nodes: TaskNode[]) =>
+                      leafNodes(nodes || []).length
+                        ? Promise.resolve()
+                        : Promise.reject(new Error("请至少添加一个测试项")),
+                  },
+                ]}
               >
                 <TaskItemsFields
                   cases={cases.data?.items || []}

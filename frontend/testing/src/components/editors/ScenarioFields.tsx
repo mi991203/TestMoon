@@ -3,14 +3,7 @@ import type { Asset } from "../../models/resources";
 import type { StepDraft } from "../../models/editors";
 import { RequestFields } from "./RequestFields";
 import { useMemo, useState } from "react";
-import {
-  Checkbox,
-  Input,
-  Modal,
-  Select,
-  Space,
-  Typography,
-} from "antd";
+import { Checkbox, Input, Modal, Select, Space, Typography } from "antd";
 import { Pairs } from "@testmoon/web";
 import { blankRequest, requestPatch, hasRequestPatch } from "./defaults";
 import { CaseFields } from "./CaseFields";
@@ -30,10 +23,14 @@ export function ScenarioFields({
   readOnly?: boolean;
 }) {
   const steps = useMemo(() => {
-    const normalize = (nodes: StepDraft[]): StepDraft[] => nodes.map((node) => ({
-      ...node, id: node.id || crypto.randomUUID(),
-      ...(node.kind === "folder" ? { children: normalize(node.children || []) } : {}),
-    }));
+    const normalize = (nodes: StepDraft[]): StepDraft[] =>
+      nodes.map((node) => ({
+        ...node,
+        id: node.id || crypto.randomUUID(),
+        ...(node.kind === "folder"
+          ? { children: normalize(node.children || []) }
+          : {}),
+      }));
     return normalize(value.steps || []);
   }, [value.steps]);
   const [editing, setEditing] = useState<{ key?: string; parent: string }>();
@@ -56,12 +53,26 @@ export function ScenarioFields({
         value={steps}
         onChange={(steps) => onChange({ ...value, steps })}
         readOnly={readOnly}
-        title={(st) => (st.name || cases.find((v) => v.id === st.case_id)?.name || "独立请求") + (st.continue_on_failure ? " · 失败后继续" : "")}
-        createFolder={(name) => ({ id: crypto.randomUUID(), kind: "folder", name, children: [] })}
+        title={(st) =>
+          (st.name ||
+            cases.find((v) => v.id === st.case_id)?.name ||
+            "独立请求") + (st.continue_on_failure ? " · 失败后继续" : "")
+        }
+        createFolder={(name) => ({
+          id: crypto.randomUUID(),
+          kind: "folder",
+          name,
+          children: [],
+        })}
         onEdit={edit}
         addLabel="添加步骤"
         onAdd={(parent) => {
-          setStep({ id: crypto.randomUUID(), kind: "step", name: "", inline: { request: blankRequest() } });
+          setStep({
+            id: crypto.randomUUID(),
+            kind: "step",
+            name: "",
+            inline: { request: blankRequest() },
+          });
           setStepType("inline");
           setOver(false);
           setEditing({ parent });
@@ -80,7 +91,9 @@ export function ScenarioFields({
           onChange({ ...value, steps: next });
           setEditing(undefined);
         }}
-        okButtonProps={{ disabled: readOnly || (stepType === "reference" && !step.case_id) }}
+        okButtonProps={{
+          disabled: readOnly || (stepType === "reference" && !step.case_id),
+        }}
         destroyOnHidden
       >
         <Space direction="vertical" style={{ width: "100%" }}>
