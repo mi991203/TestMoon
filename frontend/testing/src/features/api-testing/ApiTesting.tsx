@@ -128,17 +128,24 @@ export function ApiTesting({ scope, role }: Context) {
           <Typography.Text strong>API测试</Typography.Text>
           {editable(role) && (
             <Space size={4}>
-            <Button size="small" onClick={() => setImportFolder(selectedFolder || parent.data?.folder_id || "")}>
-              导入
-            </Button>
-            <Button
-              size="small"
-              onClick={() =>
-                setFolderEdit({ name: "", folder_id: selectedFolder || "" })
-              }
-            >
-              新建目录
-            </Button>
+              <Button
+                size="small"
+                onClick={() =>
+                  setImportFolder(
+                    selectedFolder || parent.data?.folder_id || "",
+                  )
+                }
+              >
+                导入
+              </Button>
+              <Button
+                size="small"
+                onClick={() =>
+                  setFolderEdit({ name: "", folder_id: selectedFolder || "" })
+                }
+              >
+                新建目录
+              </Button>
             </Space>
           )}
         </div>
@@ -253,17 +260,20 @@ export function ApiTesting({ scope, role }: Context) {
           />
         </Routes>
       </section>
-      {importFolder !== null && <Imports
-        scope={scope}
-        role={role}
-        initialFolderId={importFolder}
-        onClose={() => setImportFolder(null)}
-        onImported={(folder) => {
-          setImportFolder(null);
-          go(folder ? `/api-testing/folders/${folder}` : "/api-testing");
-          if (folder) setExpanded((old) => [...new Set([...old, `folder:${folder}`])]);
-        }}
-      />}
+      {importFolder !== null && (
+        <Imports
+          scope={scope}
+          role={role}
+          initialFolderId={importFolder}
+          onClose={() => setImportFolder(null)}
+          onImported={(folder) => {
+            setImportFolder(null);
+            go(folder ? `/api-testing/folders/${folder}` : "/api-testing");
+            if (folder)
+              setExpanded((old) => [...new Set([...old, `folder:${folder}`])]);
+          }}
+        />
+      )}
       {folderEdit && (
         <FolderDialog
           key={folderEdit.id || "new"}

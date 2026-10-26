@@ -57,6 +57,8 @@ make infra-down        # 停止此Compose项目（包括已启动的应用），
 
 日志在 `.local/logs/`，本地二进制在 `.local/bin/`。修改业务代码后执行 `make build-all`、`make stop`、`make dev`。前端可分别用 `pnpm --filter @testmoon/portal dev` 与 `pnpm --filter @testmoon/testing dev` 进行热更新；Cookie/Origin 的完整联调以网关生产构建为准。
 
+前端与共享前端库统一使用 Prettier 格式化：运行 `pnpm format` 整理 HTML、TS/TSX、CSS 和 JSON，运行 `pnpm format:check` 检查格式。配置见 `.prettierrc.json`，自动生成的 API 客户端不参与格式化。
+
 ## Runner 启动
 
 进入项目「Runner 管理」生成私有节点的一次性注册凭证。公共节点由门户中的平台管理员创建。未部署在线节点时拒绝新执行。

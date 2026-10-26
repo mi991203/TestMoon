@@ -13,13 +13,12 @@ import {
   Tabs,
   Typography,
 } from "antd";
-import {
-  ErrorState,
-  JSONView,
-  Scope,
-  Status,
-} from "@testmoon/web";
-export function RunResult({ scope, id, onReport }: {
+import { ErrorState, JSONView, Scope, Status } from "@testmoon/web";
+export function RunResult({
+  scope,
+  id,
+  onReport,
+}: {
   scope: Scope;
   id: string;
   onReport?: () => void;
@@ -49,7 +48,11 @@ export function RunResult({ scope, id, onReport }: {
                   children: <Status value={data.run.state} />,
                 },
                 { key: "id", label: "执行ID", children: data.run.id },
-                { key: "duration", label: "执行耗时", children: data.result ? `${data.result.duration_ms} ms` : "—" },
+                {
+                  key: "duration",
+                  label: "执行耗时",
+                  children: data.result ? `${data.result.duration_ms} ms` : "—",
+                },
                 {
                   key: "time",
                   label: "提交时间",
@@ -65,7 +68,11 @@ export function RunResult({ scope, id, onReport }: {
             {!data.result ? (
               <Empty
                 style={{ margin: 60 }}
-                description={active(data.run.state) ? "等待 Runner 返回执行结果" : "执行已结束，暂无响应结果"}
+                description={
+                  active(data.run.state)
+                    ? "等待 Runner 返回执行结果"
+                    : "执行已结束，暂无响应结果"
+                }
               />
             ) : (
               (data.result.items || []).map((item) => (
@@ -80,7 +87,9 @@ export function RunResult({ scope, id, onReport }: {
                   }
                 >
                   <Collapse
-                    defaultActiveKey={item.steps?.length === 1 ? [item.steps[0].id] : []}
+                    defaultActiveKey={
+                      item.steps?.length === 1 ? [item.steps[0].id] : []
+                    }
                     items={(item.steps || []).map((step) => ({
                       key: step.id,
                       label: (
@@ -133,11 +142,17 @@ export function RunResult({ scope, id, onReport }: {
                                     <JSONView value={step.response?.body} />
                                     <Collapse
                                       ghost
-                                      items={[{
-                                        key: "headers",
-                                        label: "响应头",
-                                        children: <JSONView value={step.response?.headers} />,
-                                      }]}
+                                      items={[
+                                        {
+                                          key: "headers",
+                                          label: "响应头",
+                                          children: (
+                                            <JSONView
+                                              value={step.response?.headers}
+                                            />
+                                          ),
+                                        },
+                                      ]}
                                     />
                                   </>
                                 ),

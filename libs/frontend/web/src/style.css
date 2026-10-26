@@ -91,24 +91,49 @@ body {
   min-width: 0;
   flex-wrap: wrap;
 }
-.scope-controls > .ant-space { min-width: 0; }
-.scope-controls .ant-select { max-width: 220px; }
-.account-controls { flex-shrink: 0; white-space: nowrap; }
+.scope-controls > .ant-space {
+  min-width: 0;
+}
+.scope-controls .ant-select {
+  max-width: 220px;
+}
+.account-controls {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
 .execution-fields {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
-.execution-fields .ant-select { width: 100%; }
-.inline-run-result { margin-top: 24px; scroll-margin-top: 20px; }
-.import-target { min-width: 280px; }
+.execution-fields .ant-select {
+  width: 100%;
+}
+.inline-run-result {
+  margin-top: 24px;
+  scroll-margin-top: 20px;
+}
+.import-target {
+  min-width: 280px;
+}
 @media (max-width: 1200px) {
-  .topbar { height: auto; min-height: 76px; padding-block: 12px; }
-  .scope-controls { gap: 12px; }
-  .scope-controls .ant-select { max-width: 180px; }
+  .topbar {
+    height: auto;
+    min-height: 76px;
+    padding-block: 12px;
+  }
+  .scope-controls {
+    gap: 12px;
+  }
+  .scope-controls .ant-select {
+    max-width: 180px;
+  }
 }
 @media (max-width: 700px) {
-  .execution-fields { grid-template-columns: 1fr; gap: 0; }
+  .execution-fields {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
 }
 .content {
   padding: 30px 36px;

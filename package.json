@@ -6,11 +6,14 @@
     "node": ">=24.22.0 <25"
   },
   "scripts": {
+    "format": "prettier --write \"{frontend,libs/frontend}/**/*.{html,ts,tsx,css,json}\"",
+    "format:check": "prettier --check \"{frontend,libs/frontend}/**/*.{html,ts,tsx,css,json}\"",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck"
   },
   "devDependencies": {
-    "typescript": "catalog:",
-    "@types/node": "catalog:"
+    "@types/node": "catalog:",
+    "prettier": "3.9.10",
+    "typescript": "catalog:"
   }
 }

@@ -293,7 +293,13 @@ export function App() {
             />
             <Route
               path="imports"
-              element={<Navigate to={{ pathname: "/api-testing", search: location.search }} replace state={{ openImport: true }} />}
+              element={
+                <Navigate
+                  to={{ pathname: "/api-testing", search: location.search }}
+                  replace
+                  state={{ openImport: true }}
+                />
+              }
             />
             <Route
               path="documents"

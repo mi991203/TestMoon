@@ -29,7 +29,11 @@ export function ApiList({ scope, role }: Context) {
   const pending = [...descendants];
   for (let i = 0; i < pending.length; i++) {
     for (const folder of folders.data?.items || []) {
-      if (folder.document.kind === "api" && folder.folder_id === pending[i] && !descendants.has(folder.id)) {
+      if (
+        folder.document.kind === "api" &&
+        folder.folder_id === pending[i] &&
+        !descendants.has(folder.id)
+      ) {
         descendants.add(folder.id);
         pending.push(folder.id);
       }
