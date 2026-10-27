@@ -1,113 +1,129 @@
 # TestMoon
 
-面向开发测试的大仓应用集。首个应用为低代码 HTTP 测试平台，统一门户、网关及账号组织能力供后续应用复用。
-
-已实现 API、接口用例、顺序场景、手动任务、执行报告、HTTP Mock、接口文档分享、环境、项目及公共/项目私有 Runner。首版执行 HTTP；协议和前后置操作保留版本化扩展入口。
+低代码 HTTP 测试平台，支持 API 调试、用例与场景编排、任务执行、报告、Mock 和接口文档分享；提供统一门户、组织权限及公共/项目私有 Runner。
 
 ## 本地启动
 
-推荐使用 Docker Compose 运行整个平台，本机只运行私有 Runner。需要 Docker、Compose v2+、Python 3 和 Go 1.27（toolchain 自动选择 1.27.3）；Node、pnpm 和前端均在镜像内构建。
+需要已启动的 Docker、Compose v2+、Python 3 和 Go 1.27（toolchain 1.27.3）。平台在容器内构建运行，Runner 在本机运行。以下命令均在仓库根目录执行。
 
-从原本机进程部署迁移时，先执行 `./scripts/dev.sh stop`，并停止原先手动运行的 Runner。保留 `deploy/local/.env`、`.local/runner.json` 和已有数据卷；平台地址继续使用 `http://localhost:18080`，无需重新注册节点。
+1. 准备配置、Runner 和 Worker 镜像，启动平台：
+
+   ```bash
+   ./scripts/local-prepare.sh
+   docker compose --env-file deploy/local/.env -f deploy/local/compose.yaml up -d --build --wait
+   ```
+
+2. 打开 <http://localhost:18080>，使用自动生成的 `deploy/local/.env` 中的 `TESTMOON_BOOTSTRAP_USERNAME`、`TESTMOON_BOOTSTRAP_PASSWORD` 登录。平台管理员创建组织并指定组织管理员，由组织管理员进入测试应用创建项目；平台管理员不自动拥有组织业务权限。
+
+3. 在项目「Runner 管理」创建私有节点，生成一次性注册凭证并启动 Runner：
+
+   ```bash
+   TESTMOON_ENROLLMENT_TOKEN='<一次性注册凭证>' ./scripts/runner.sh start
+   ```
+
+注册状态保存在 `.local/runner.json`，后续无需凭证。有在线 Runner 后即可执行测试。
+
+### 日常操作
+
+启动已有服务：
 
 ```bash
-./scripts/local-prepare.sh  # 首次：准备私有配置、Worker镜像、本机Runner
-docker compose --env-file deploy/local/.env -f deploy/local/compose.yaml up -d --build --wait
+docker compose --env-file deploy/local/.env -f deploy/local/compose.yaml up -d --wait
 ./scripts/runner.sh start
 ```
 
-第一次使用 Runner，需要先在界面创建私有节点，将一次性凭证通过 `TESTMOON_ENROLLMENT_TOKEN` 环境变量传给启动脚本；已有 `.local/runner.json` 时不需要凭证。
+等待执行任务结束后停机：
+
+```bash
+./scripts/runner.sh stop
+docker compose --env-file deploy/local/.env -f deploy/local/compose.yaml stop
+```
+
+更新平台代码：执行首次启动中带 `--build` 的命令，再执行 `./scripts/runner.sh start`。修改 Runner/Worker：先停止 Runner、执行 `./scripts/local-prepare.sh`，再启动。两者均修改时先准备 Runner/Worker，再更新平台，最后启动 Runner。
+
+查看状态和日志：
 
 ```bash
 docker compose --env-file deploy/local/.env -f deploy/local/compose.yaml ps
 docker compose --env-file deploy/local/.env -f deploy/local/compose.yaml logs --tail 100 gateway execution
 ./scripts/runner.sh status
-./scripts/runner.sh stop
-docker compose --env-file deploy/local/.env -f deploy/local/compose.yaml stop
 ```
 
-日常启动可省略 `--build`；修改平台代码后重新执行带 `--build` 的启动命令。修改 Runner/Worker 后重跑准备命令并重启 Runner。`stop` 保留容器，`down` 删除容器及网络但保留数据卷。停机前等待任务结束，先停 Runner 再停平台；平台停止期间，Runner 持续心跳失败会退出，平台恢复后需再次启动 Runner。
+本机日志在 `.local/logs/`。`stop` 保留容器和数据；`down` 删除容器及网络，保留数据卷。保管好 `deploy/local/.env` 和 `.local/runner.json`，勿提交到 Git。
 
-Compose 内的服务通过服务名访问，网关发布到本机 `18080`；本机 Runner 经此入口连接平台，并使用本机网络访问被测 API。Worker 仍按执行创建且没有直接网络。VPN 需提供本机可用的 DNS/直连路由；Runner 当前不使用系统 HTTP 代理。
+## 源码开发
 
-### 本机源码开发
-
-原有开发方式仍保留，与 Compose 应用部署二选一，避免端口冲突。需要额外安装 Node 24.22.0 LTS、pnpm 11.28.6。协议文件已生成并提交；只有修改 proto 才需要 protoc 36.2 和生成插件。
+额外安装 Node 24.22.0 LTS、pnpm 11.28.6、Make 和 curl。与 Compose 平台部署二选一，切换前停止另一种方式的应用服务。
 
 ```bash
 make deps
-make infra-up          # MySQL、Redis、Kafka 健康检查及四个业务数据库
-make build-all         # 分别使用 Go 和 pnpm 构建，Makefile 统一入口
-make worker-image      # 执行时必须有本地 Worker 镜像
+make infra-up          # 启动 MySQL、Redis、Kafka，创建业务数据库
+make build-all         # 构建后端、Runner 和前端
+make worker-image
 make dev
 ```
 
-打开 <http://localhost:18080>。初始账号密码在自动生成的 `deploy/local/.env` 中；文件权限为 0600 且已被 Git 忽略。启动脚本不打印密码。MySQL/Redis/Kafka 数据通过 Docker volume 保留。
-
-测试应用左侧使用统一“API测试”入口，接口树可打开接口，并在Header切换API调试和关联用例；主要业务详情使用独立页面路由。
-
-首次由平台管理员创建组织并指定组织管理员；组织管理员进入测试应用创建项目。平台管理员身份不会自动取得组织业务权限。
+首次登录及 Runner 的注册、更新步骤同上。修改业务代码后执行 `make stop && make build-all && make dev`。
 
 ```bash
-make stop              # 停止本仓库脚本启动的业务服务
-make infra-down        # 停止此Compose项目（包括已启动的应用），保留数据卷
-./scripts/infra.sh up mysql redis  # 可只启动需要的中间件
 ./scripts/dev.sh status
+./scripts/runner.sh stop
+make stop              # 停止源码启动的业务服务
+make infra-down        # 删除本地 Compose 容器和网络，保留数据卷
 ```
 
-日志在 `.local/logs/`，本地二进制在 `.local/bin/`。修改业务代码后执行 `make build-all`、`make stop`、`make dev`。前端可分别用 `pnpm --filter @testmoon/portal dev` 与 `pnpm --filter @testmoon/testing dev` 进行热更新；Cookie/Origin 的完整联调以网关生产构建为准。
-
-前端与共享前端库统一使用 Prettier 格式化：运行 `pnpm format` 整理 HTML、TS/TSX、CSS 和 JSON，运行 `pnpm format:check` 检查格式。配置见 `.prettierrc.json`，自动生成的 API 客户端不参与格式化。
-
-## Runner 启动
-
-进入项目「Runner 管理」生成私有节点的一次性注册凭证。公共节点由门户中的平台管理员创建。未部署在线节点时拒绝新执行。
+前端热更新：`pnpm --filter @testmoon/portal dev`、`pnpm --filter @testmoon/testing dev`。完整联调使用网关中的前端构建产物。
 
 ```bash
-make runner-image
-# 远程机器应拉取或加载相同版本的 runner 和 worker 两个镜像。
+pnpm format            # 格式化前端及共享库，排除生成的 API 客户端
+pnpm format:check
+make typecheck
+```
+
+仅修改 proto 时需安装 protoc 36.2，再执行：
+
+```bash
+make tools             # 安装固定版本生成插件
+make generate          # 生成 Go、网关、OpenAPI 和 TS 客户端
+make typecheck
+make build-all
+```
+
+## 远程 Runner
+
+执行机器需要 Docker 和平台 HTTPS 地址。公共节点在管理员门户创建，私有节点在项目「Runner 管理」创建并生成凭证。
+
+在仓库中构建镜像，将两个镜像及 `deploy/runner/compose.yaml` 分发到执行机器：
+
+```bash
+make runner-image worker-image
+```
+
+在执行机器启动（按实际位置调整 Compose 文件路径）：
+
+```bash
 export TESTMOON_URL=https://testmoon.example.com
-export TESTMOON_ENROLLMENT_TOKEN='<界面生成的一次性凭证>'
+export TESTMOON_ENROLLMENT_TOKEN='<一次性注册凭证>'
 docker compose -f deploy/runner/compose.yaml up -d
 unset TESTMOON_ENROLLMENT_TOKEN
 ```
 
-注册成功后凭证保存在 Runner 独立状态卷；后续重启不需要注册凭证。一个私有 Runner 仅服务一个项目。公共 Runner 只允许访问公网地址；私有 Runner 可以访问它所在部署网络。容器中的 localhost 指 Runner 管理进程所在容器，而非 Docker 宿主机。
+注册状态保存在 `runner-state` 卷，后续无需凭证。Runner 需要 Docker API 权限，应使用专用执行机器；每次执行使用独立 Worker 容器。私有节点仅服务所属项目，可访问部署网络；公共节点仅能访问公网。
 
-本地可在宿主机运行 Go Runner，便于调用本机服务：
+容器中的 `localhost` 指 Runner 容器。本机 Runner 使用宿主机网络，不使用系统 HTTP 代理；VPN 需提供可用的 DNS 和直连路由。
 
-```bash
-export TESTMOON_URL=http://localhost:18080
-export TESTMOON_ALLOW_HTTP=1 # 仅本地联调
-export TESTMOON_ENROLLMENT_TOKEN='<私有节点凭证>'
-export TESTMOON_RUNNER_STATE="$PWD/.local/runner.json"
-export DOCKER_HOST="$(docker context inspect --format '{{.Endpoints.docker.Host}}')"
-.local/bin/runner
-```
+## Mock 与文档分享
 
-Runner 管理进程需要 Docker API 权限，应部署在专用执行机器。每次执行创建独立、无直接网络、只读、非 root、限资源容器；执行容器不挂 Docker socket、宿主文件或平台凭证。`vm` 用于 JS 接口环境，隔离边界是每次执行的 Docker 容器。
+- Mock：`http://mock.localhost:18080/m/<endpoint-id>/<path>`。无法解析时，在 hosts 中添加 `127.0.0.1 mock.localhost`；生产环境使用与 Web 不同的 Mock 域名。
+- 环境变量：接口地址可用 `{{base_url}}`，在项目环境中配置其值。
+- 文档分享：`/share/<随机token>`，支持密码、有效期和撤销，展示所选接口的当前定义。
 
-## Mock 与文档
+## 参考文档
 
-Mock 独立域名为 `http://mock.localhost:18080/m/<endpoint-id>/<path>`；若操作系统不解析 `mock.localhost`，本地 hosts 将其映射到 `127.0.0.1`。生产必须使用与 Web 不同的 Mock 域名。测试接口可使用 `{{base_url}}`，由项目环境配置。
-
-文档分享在 `/share/<随机token>`，可设置密码、有效期并撤销；内容为所选接口的当前定义，不包含项目环境与用例。
-
-## 构建与文档
-
-```bash
-make tools             # 安装固定版本 protoc Go/gRPC/gateway/OpenAPI 插件
-make generate          # 原生 protoc，统一生成 Go、网关、OpenAPI、TS客户端
-make typecheck
-make build-go
-make build-web
-```
-
-- [需求目录](docs/requirements/README.md)：统一存放需求及验收条件。
-- [目录与技术方案](docs/architecture/项目结构与技术选型.md)：依赖、服务边界、数据与运行机制。
-- [接口与扩展约定](docs/architecture/接口与扩展约定.md)：HTTP/gRPC、变量、脚本和导入兼容边界。
-- [数据模型与迁移](docs/architecture/数据模型与迁移.md)：分服务建表定义、历史回填与升级边界。
-- [部署配置](docs/architecture/部署配置.md)：端口、配置优先级、限额和生产部署条件。
-- [实现与验证记录](docs/requirements/delivery.md)：已验证路径及未验证范围。
-
-平台支持 Compose 镜像构建，也保留原生工具与 Makefile 开发入口，未引入 Bazel 或 CI。
+- [需求与验收](docs/requirements/README.md)
+- [项目结构与技术选型](docs/architecture/项目结构与技术选型.md)
+- [API 文档](API文档.md)
+- [接口与扩展约定](docs/architecture/接口与扩展约定.md)
+- [数据模型与迁移](docs/architecture/数据模型与迁移.md)
+- [部署配置](docs/architecture/部署配置.md)
+- [实现与验证记录](docs/requirements/delivery.md)
