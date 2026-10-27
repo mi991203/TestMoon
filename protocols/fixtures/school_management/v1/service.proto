@@ -1,0 +1,132 @@
+syntax = "proto3";
+package testmoon.fixtures.school_management.v1;
+option go_package = "github.com/mi991203/TestMoon/protocols/fixtures/school_management/v1;schoolmanagementv1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+message School {
+  string id = 1;
+  string name = 2;
+  string address = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+message CreateSchoolRequest {
+  string name = 1;
+  string address = 2;
+}
+message UpdateSchoolRequest {
+  string id = 1;
+  string name = 2;
+  string address = 3;
+}
+message GetSchoolRequest { string id = 1; }
+message DeleteSchoolRequest { string id = 1; }
+message ListSchoolsRequest {
+}
+message ListSchoolsResponse { repeated School items = 1; }
+
+message Class {
+  string id = 1;
+  string school_id = 2;
+  string name = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+message CreateClassRequest {
+  string school_id = 1;
+  string name = 2;
+}
+message UpdateClassRequest {
+  string id = 1;
+  string school_id = 2;
+  string name = 3;
+}
+message GetClassRequest { string id = 1; }
+message DeleteClassRequest { string id = 1; }
+message ListClassesRequest {
+  string school_id = 1;
+}
+message ListClassesResponse { repeated Class items = 1; }
+
+message Student {
+  string id = 1;
+  string class_id = 2;
+  string name = 3;
+  string student_no = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message CreateStudentRequest {
+  string class_id = 1;
+  string name = 2;
+  string student_no = 3;
+}
+message UpdateStudentRequest {
+  string id = 1;
+  string class_id = 2;
+  string name = 3;
+  string student_no = 4;
+}
+message GetStudentRequest { string id = 1; }
+message DeleteStudentRequest { string id = 1; }
+message ListStudentsRequest {
+  string school_id = 1;
+  string class_id = 2;
+}
+message ListStudentsResponse { repeated Student items = 1; }
+
+// A standalone fixture: no platform session or service key is required.
+// PUT replaces all editable fields. Deletes physically cascade through foreign keys.
+service SchoolManagement {
+  rpc CreateSchool(CreateSchoolRequest) returns (School) {
+    option (google.api.http) = { post: "/api/school-management/v1/schools" body: "*" };
+  }
+  rpc GetSchool(GetSchoolRequest) returns (School) {
+    option (google.api.http) = { get: "/api/school-management/v1/schools/{id}" };
+  }
+  rpc ListSchools(ListSchoolsRequest) returns (ListSchoolsResponse) {
+    option (google.api.http) = { get: "/api/school-management/v1/schools" };
+  }
+  rpc UpdateSchool(UpdateSchoolRequest) returns (School) {
+    option (google.api.http) = { put: "/api/school-management/v1/schools/{id}" body: "*" };
+  }
+  rpc DeleteSchool(DeleteSchoolRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { delete: "/api/school-management/v1/schools/{id}" };
+  }
+  rpc CreateClass(CreateClassRequest) returns (Class) {
+    option (google.api.http) = { post: "/api/school-management/v1/classes" body: "*" };
+  }
+  rpc GetClass(GetClassRequest) returns (Class) {
+    option (google.api.http) = { get: "/api/school-management/v1/classes/{id}" };
+  }
+  rpc ListClasses(ListClassesRequest) returns (ListClassesResponse) {
+    option (google.api.http) = { get: "/api/school-management/v1/classes" };
+  }
+  rpc UpdateClass(UpdateClassRequest) returns (Class) {
+    option (google.api.http) = { put: "/api/school-management/v1/classes/{id}" body: "*" };
+  }
+  rpc DeleteClass(DeleteClassRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { delete: "/api/school-management/v1/classes/{id}" };
+  }
+  rpc CreateStudent(CreateStudentRequest) returns (Student) {
+    option (google.api.http) = { post: "/api/school-management/v1/students" body: "*" };
+  }
+  rpc GetStudent(GetStudentRequest) returns (Student) {
+    option (google.api.http) = { get: "/api/school-management/v1/students/{id}" };
+  }
+  rpc ListStudents(ListStudentsRequest) returns (ListStudentsResponse) {
+    option (google.api.http) = { get: "/api/school-management/v1/students" };
+  }
+  rpc UpdateStudent(UpdateStudentRequest) returns (Student) {
+    option (google.api.http) = { put: "/api/school-management/v1/students/{id}" body: "*" };
+  }
+  rpc DeleteStudent(DeleteStudentRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { delete: "/api/school-management/v1/students/{id}" };
+  }
+}
