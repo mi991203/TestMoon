@@ -2,7 +2,7 @@
 
 范围：在已有业务和微服务边界下改善包结构、PB、接口、持久化及前端可维护性，不增加新业务能力，不新增单元测试。
 
-- 后端参考CodeMatrix的api、cmd、conf、dao、internal、logic、serializer、thirdparty分层；数据库实体单独放model。按实际职责创建包，共享依赖仍在根go.mod。
+- 后端参考 大仓 的api、cmd、conf、dao、internal、logic、serializer、thirdparty分层；数据库实体单独放model。按实际职责创建包，共享依赖仍在根go.mod。
 - 每种资源及每种操作使用独立Request/Response和命名RPC；固定字段明确建模，Struct/Value仅承载动态Schema或任意JSON期望值。
 - 创建与更新、成员设置与移除、公共与私有Runner操作分别定义；执行接口按HTTP调试、接口用例、场景和任务区分。
 - 数据库定义明确固定字段、资源归属与索引，保持soft_delete.DeletedAt；历史资源、任务和Mock定义通过兼容迁移保留。
