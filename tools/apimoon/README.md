@@ -2,13 +2,70 @@
 
 供 AI Agent 调用 TestMoon 的 Go CLI。Agent 读取需求和项目代码、生成测试计划；APIMoon 负责校验、同步资源、提交执行和读取结构化报告。测试在平台 Runner 执行，CLI 不调用模型。
 
-## 构建和配置
+## 从 GitHub Releases 安装
 
-在仓库根目录执行（Go 版本同根 `go.mod`）：
+普通使用者下载预编译 APIMoon、Runner，并在本机 Docker 中构建 Worker，无需安装 Go 或 Node。支持 macOS、Linux、Windows 的 amd64、arm64；macOS/Linux 提供 `.tar.gz`，Windows 直接提供两个 `.exe`。运行测试需要已启动的 Docker。
+
+在 [GitHub Releases](https://github.com/mi991203/TestMoon/releases) 选择与平台兼容的 `apimoon-vX.Y.Z` 发布，下载对应系统和架构的 `apimoon_vX.Y.Z_<系统>_<架构>.tar.gz` 及 `SHA256SUMS`。例如 Apple Silicon 使用 `darwin_arm64`，Linux x86-64 使用 `linux_amd64`。
+
+使用 `shasum -a 256 <安装包>` 或 `sha256sum <安装包>` 与 `SHA256SUMS` 中的对应行比较，再解压。以下版本号需替换为实际发布版本：
 
 ```bash
-make build-apimoon
-export PATH="$PWD/.local/bin:$PATH"
+tar -xzf apimoon_v0.1.0_darwin_arm64.tar.gz
+cd apimoon_v0.1.0_darwin_arm64
+bash install.sh
+export PATH="$HOME/.local/bin:$PATH"
+apimoon version
+testmoon-runner --version
+```
+
+默认安装两个程序到 `~/.local/bin`；自定义目录使用 `bash install.sh /自定义/bin`。将该目录加入终端及 Agent 的 PATH。安装或升级保留 `~/.api_moon/` 中的登录、作用域、同步状态和 Runner 状态。
+
+CLI 内嵌 Skill，macOS/Linux 发布包还包含 Worker 构建脚本以及 `VERSION`、`COMMIT`、`REPOSITORY`。保留解压目录以便构建 Worker；程序安装后可在任意业务项目中调用。Windows 下载相同架构的 `apimoon_vX.Y.Z_windows_<架构>.exe`、`testmoon-runner_vX.Y.Z_windows_<架构>.exe` 及 `SHA256SUMS`，校验后可重命名为 `apimoon.exe`、`testmoon-runner.exe` 并加入 PATH，无需解压。PowerShell 安装及 Worker 构建步骤见 [发布产物使用说明](distribution/README.md)。示例版本号需替换为实际已发布版本。
+
+## 通过 APIMoon 安装 Agent Skill
+
+[APIMoon Skill](skills/apimoon/SKILL.md) 及引用文档直接内嵌在 CLI 中，安装后即使只保留 `apimoon` 可执行文件，也可离线安装 Skill，无需登录平台、源码目录、Node 或额外安装脚本。
+
+```bash
+# Codex，用户级安装，跨项目使用。
+apimoon skill install --agent codex --global
+
+# Trae 国际版 / 国内版，用户级安装。
+apimoon skill install --agent trae --global
+apimoon skill install --agent trae-cn --global
+
+# 默认安装到当前业务项目；也可明确指定项目目录。
+apimoon skill install --agent codex
+apimoon skill install --agent trae-cn --project-dir /业务项目
+```
+
+| Agent | 当前项目默认目录 | 用户级目录（--global） |
+| --- | --- | --- |
+| `codex` | `.agents/skills/apimoon` | `~/.agents/skills/apimoon` |
+| `trae` | `.trae/skills/apimoon` | `~/.trae/skills/apimoon` |
+| `trae-cn` | `.trae/skills/apimoon` | `~/.trae-cn/skills/apimoon` |
+
+命令形态参考 [Vercel Skills CLI](https://github.com/vercel-labs/skills/blob/main/docs/commands.md) 的 agent 与 project/global 选择方式；目录依据 [Codex 官方文档](https://learn.chatgpt.com/docs/build-skills)、[TRAE 国内版官方文档](https://docs.trae.cn/ide_skills) 及 [Skills Agent 兼容表](https://github.com/vercel-labs/skills/blob/main/docs/agents.md)。Trae 国际版和国内版的用户级目录不同，需要选择正确的 agent。
+
+检查及更新使用：
+
+```bash
+apimoon skill status --agent codex --global
+apimoon skill install --agent codex --global --force
+```
+
+相同内容重复安装返回 `unchanged`；状态查询返回 `not_installed/current/different`。已有内容不同时，安装返回退出码 4；确认更新后使用 `--force`，原目录备份到 skills 根目录之外，备份路径在 JSON 的 `data.backup` 返回，避免备份也被 Agent 当作 Skill 加载。符号链接目标需要先自行处理，不会被强制覆盖。
+
+`--dir /自定义/skills` 可显式指定 skills 根目录，命令会追加 `apimoon`；它与 `--global`、`--project-dir` 不能同时使用。安装结果返回 agent、scope、path、status 和 bundled_version。
+
+在 Codex 中可显式请求 `使用 $apimoon，根据需求和当前项目代码生成接口测试，使用 TestMoon 执行并分析报告。` Trae 可在技能面板确认已安装，再在对话中请求使用 APIMoon Skill；两者也可根据描述按需加载。安装 Skill 不会启动 Runner，Agent 执行环境仍需能找到 `apimoon` 并执行本机命令。
+
+## 连接平台与本机 Runner
+
+CLI 安装完成后配置连接：
+
+```bash
 apimoon config init --base-url http://localhost:18080
 # 从标准输入提供密码，避免写入命令参数或历史。
 apimoon auth login --username <用户名> --password-stdin
@@ -24,6 +81,16 @@ apimoon context show
 ```
 
 `auth login` 读取 stdin 至 EOF；交互输入后按 Ctrl+D，也可由 Agent 通过子进程 stdin 传入。使用现有用户登录会话（Cookie + CSRF）；密码不落盘。需要预先在平台创建组织、项目和 Runner，并为登录用户授予相应项目权限。
+
+macOS/Linux 本机 Docker 启动后，在发布包解压目录构建 Worker（Windows 见 [使用说明](distribution/README.md#windows-使用与本地-worker)）：
+
+```bash
+bash build-worker.sh
+```
+
+脚本按安装包的 `COMMIT` 下载源码，在 Docker 内完成 Go/Node 构建，生成 `testmoon/worker:<发布版本，去掉v前缀>`。宿主机不需要 Go/Node，也不需要 Git 或 Make；有干净的对应版本源码时可用 `bash build-worker.sh /本地/TestMoon`。Worker 镜像保存在本机 Docker 中。
+
+`testmoon-runner` 使用该镜像创建执行容器；启动前显式设置 `TESTMOON_WORKER_IMAGE` 为构建得到的标签。首次启动使用项目私有节点的一次性注册凭证，详细前台启动步骤见 [本机 Runner 接入](skills/apimoon/references/setup.md)。当前 APIMoon 的 Runner 命令仅支持 `runner list`，本机 Runner 的自动注册和进程管理尚未接入 CLI。
 
 默认配置为 `~/.api_moon/config.yaml`，可通过 `--config FILE` 指定；[配置示例](examples/config.yaml)。配置与同步状态原子写入，文件权限为 `0600`，新建目录为 `0700`。`config show` 隐去会话凭证；会话到期后重新登录，改变 `base_url` 会清除鉴权信息。切换组织清除项目、环境、Runner；切换项目清除环境、Runner。
 
@@ -106,10 +173,21 @@ apimoon case update --id <用例ID> --revision <版本> --file case.json
 apimoon task delete --id <任务ID>
 apimoon auth status
 apimoon auth logout
-apimoon --help --output text
+apimoon --help
+apimoon plan sync --help
+apimoon skill install --help
 ```
 
-默认 stdout 为单份 JSON：`{"ok":true,"data":...}` 或 `{"ok":false,"error":{"code":...,"message":...}}`；部分失败仍会携带 `data`（同步进度或执行 ID）。进度写 stderr，`--output text` 使用易读缩进。报告查询成功的退出码为 0，即使报告状态为 failed；等待执行结束时只有 passed 返回 0，unverified 也返回 6。
+命令使用 Cobra 注册，每一级命令都支持 `--help` / `-h`，也可使用 `apimoon help plan sync`。帮助按当前命令展示说明、参数、默认值及示例，不读取平台配置或发起请求。`--config`、`--output`、`--org`、`--project` 为公共参数；其余选项属于对应命令，无关参数会报错。资源 ID 和 revision 仍可从 `--file` 提供，无需重复传递对应选项。
+
+业务命令的 stdout 默认是单份 JSON：`{"ok":true,"data":...}` 或 `{"ok":false,"error":{"code":...,"message":...}}`；部分失败仍会携带 `data`（同步进度或执行 ID）。进度写 stderr，`--output text` 使用易读缩进。帮助和 Shell 补全输出纯文本。报告查询成功的退出码为 0，即使报告状态为 failed；等待执行结束时只有 passed 返回 0，unverified 也返回 6。
+
+可生成 Bash、Zsh、Fish 和 PowerShell 的补全脚本，例如：
+
+```bash
+apimoon completion bash > apimoon.bash
+apimoon completion zsh > _apimoon
+```
 
 | 退出码 | 含义 |
 | --- | --- |
@@ -127,7 +205,7 @@ HTTP 请求默认超时 30 秒；等待默认 30 分钟、轮询 2 秒，可设�
 
 ```text
 cmd/main.go           进程入口
-cli/                  命令路由、参数、鉴权与输出适配
+cli/                  Cobra 命令树、按命令注册参数、鉴权与输出适配
 config/               YAML 配置、作用域与配置校验
 platform/             类型协议、HTTP 会话客户端和资源操作
 validate/             资源文档与编排校验
@@ -136,6 +214,7 @@ execution/            运行轮询与报告摘要
 clierror/             结构化错误
 fileio/               私有文件原子写入
 jsonutil/             严格 JSON 解码与对象操作
+skills/               内嵌 Skill、Codex/Trae 安装与状态检查
 tests/                模拟平台的跨包功能测试
 ```
 
@@ -147,3 +226,53 @@ make build-apimoon
 ```
 
 当前范围不含模型接入、稳定性标注及自动筛选执行、平台集成令牌、跨机器同步和 Runner 执行语义修改。
+
+## 维护者构建和发布
+
+本节面向维护者，需要 Git、Make 和根 `go.mod` 指定的 Go 工具链。开发时仍可执行：
+
+```bash
+make build-apimoon
+make install-apimoon APIMOON_BIN_DIR=/自定义/bin
+make install-apimoon-skill APIMOON_SKILLS_DIR=/自定义/skills
+```
+
+`make build-apimoon` 构建当前系统的程序，位于 `.local/bin/apimoon/apimoon`（Windows 为 `apimoon.exe`）。旧版位于 `.local/bin/apimoon` 的单个程序会自动迁入该目录；`make install-apimoon` 的用户级安装目录不变。
+
+一次构建 macOS、Linux、Windows 的 amd64 和 arm64 程序：
+
+```bash
+make build-apimoon-all
+```
+
+产物位于 `.local/bin/apimoon/`：
+
+```text
+apimoon_darwin_amd64
+apimoon_darwin_arm64
+apimoon_linux_amd64
+apimoon_linux_arm64
+apimoon_windows_amd64.exe
+apimoon_windows_arm64.exe
+```
+
+交叉编译设置 `CGO_ENABLED=0`，无需安装目标平台的 C 编译器。可指定构建目标或输出目录，例如 `make build-apimoon-all APIMOON_BUILD_TARGETS="linux/amd64 windows/amd64" APIMOON_BUILD_DIR=.local/custom-apimoon`。
+
+本地验证发布包（产物默认在 `.local/apimoon-release/v0.1.0`）：
+
+```bash
+make release-apimoon APIMOON_VERSION=v0.1.0
+```
+
+会交叉编译六个平台的 APIMoon 及 Runner：macOS/Linux 为四个 `.tar.gz`（含程序和 Worker 构建脚本），Windows 为四个独立 `.exe`（两个架构各有 APIMoon、Runner），并生成覆盖全部附件的 `SHA256SUMS`。Windows 文件名为 `apimoon_vX.Y.Z_windows_<架构>.exe`、`testmoon-runner_vX.Y.Z_windows_<架构>.exe`。`APIMOON_RELEASE_TARGETS="windows/amd64 windows/arm64"` 可限制本地验证的平台；正式发布工作流构建全部六个平台。
+
+`.github/workflows/release-apimoon.yml` 在推送 `apimoon-vX.Y.Z` 标签时，先执行 CLI/Runner 测试，再构建并上传 GitHub Release 附件；也可通过 Actions 手动选择一个已存在的标签发布。测试版标签使用 `apimoon-vX.Y.Z-rc.1`，工作流会标为 prerelease。
+
+先合入完整发布代码，再创建并推送标签：
+
+```bash
+git tag apimoon-v0.1.0
+git push origin apimoon-v0.1.0
+```
+
+版本、提交和构建时间通过链接参数写入两个程序。正式标签的源码即 Worker 的构建来源；不要移动已发布标签或混用其他提交的 Worker 源码。

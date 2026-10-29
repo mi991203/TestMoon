@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/mi991203/TestMoon/backend/testing/runner/internal/engine"
+	"github.com/mi991203/TestMoon/libs/go/buildinfo"
 	m "github.com/mi991203/TestMoon/libs/go/testing/domain"
 	"github.com/mi991203/TestMoon/libs/go/transport"
 	contracts "github.com/mi991203/TestMoon/protocols/testing/contracts/v1"
@@ -89,7 +90,7 @@ func New(ctx context.Context) (*Agent, error) {
 			return nil, errors.New("first registration requires TESTMOON_ENROLLMENT_TOKEN")
 		}
 		response := &pb.RegisterRunnerResponse{}
-		if e := a.call(ctx, "register", &pb.RegisterRunnerRequest{Token: token, Version: "0.1.0", Capabilities: []string{"http/1", "javascript/1"}}, response); e != nil {
+		if e := a.call(ctx, "register", &pb.RegisterRunnerRequest{Token: token, Version: buildinfo.Version, Capabilities: []string{"http/1", "javascript/1"}}, response); e != nil {
 			return nil, e
 		}
 		a.State = State{RunnerID: response.RunnerId, Credential: response.Credential, Public: response.Public, Concurrency: int(response.Concurrency), URL: base}

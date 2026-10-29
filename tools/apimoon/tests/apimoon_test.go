@@ -30,6 +30,60 @@ type testPlatform struct {
 	runState         string
 }
 
+func TestVersionWithoutConfiguration(t *testing.T) {
+	missing := filepath.Join(t.TempDir(), "missing.yaml")
+	for _, command := range [][]string{{"version"}, {"--version"}} {
+		var out, logs bytes.Buffer
+		args := append(command, "--config", missing)
+		if code := cli.Execute(context.Background(), args, nil, &out, &logs); code != 0 {
+			t.Fatalf("version requires configuration: %s", out.String())
+		}
+		var response struct {
+			OK   bool `json:"ok"`
+			Data struct {
+				Version string `json:"version"`
+				OS      string `json:"os"`
+				Arch    string `json:"arch"`
+			} `json:"data"`
+		}
+		if err := json.Unmarshal(out.Bytes(), &response); err != nil || !response.OK || response.Data.Version == "" || response.Data.OS == "" || response.Data.Arch == "" {
+			t.Fatalf("invalid version response: %s", out.String())
+		}
+	}
+}
+
+func TestSkillCommandsWithoutConfiguration(t *testing.T) {
+	project := t.TempDir()
+	missing := filepath.Join(t.TempDir(), "missing.yaml")
+	call := func(action string, extra ...string) (int, map[string]any) {
+		t.Helper()
+		var out, logs bytes.Buffer
+		args := []string{"skill", action, "--agent", "trae", "--project-dir", project, "--config", missing}
+		args = append(args, extra...)
+		code := cli.Execute(context.Background(), args, nil, &out, &logs)
+		var result map[string]any
+		if err := json.Unmarshal(out.Bytes(), &result); err != nil {
+			t.Fatal(out.String(), err)
+		}
+		return code, jsonutil.Object(result["data"])
+	}
+	if code, data := call("status"); code != 0 || data["status"] != "not_installed" {
+		t.Fatal(code, data)
+	}
+	if code, data := call("install"); code != 0 || data["status"] != "installed" || data["path"] != filepath.Join(project, ".trae", "skills", "apimoon") {
+		t.Fatal(code, data)
+	}
+	if code, data := call("status"); code != 0 || data["status"] != "current" {
+		t.Fatal(code, data)
+	}
+	if code, _ := call("install", "--global"); code != 2 {
+		t.Fatal("conflicting scope flags accepted", code)
+	}
+	if code, _ := call("status", "--force"); code != 2 {
+		t.Fatal("force allowed for status", code)
+	}
+}
+
 func fixture(t *testing.T) (*testPlatform, *platform.Client, string) {
 	t.Helper()
 	f := &testPlatform{assets: map[string]map[string]any{}, runState: "passed"}

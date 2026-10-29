@@ -2,6 +2,8 @@
 
 低代码 HTTP 测试平台，支持 API 调试、用例与场景编排、任务执行、报告、Mock 和接口文档分享；提供统一门户、组织权限及公共/项目私有 Runner。
 
+使用 AI Agent 测试已有项目时，按 [APIMoon 安装说明](tools/apimoon/README.md) 从 GitHub Releases 安装预编译 CLI 和本机 Runner，并在 Docker 中本地构建 Worker；使用者无需安装 Go。以下章节用于启动或开发 TestMoon 服务端。
+
 ## 本地启动
 
 需要已启动的 Docker、Compose v2+、Python 3 和 Go 1.27（toolchain 1.27.3）。平台在容器内构建运行，Runner 在本机运行。以下命令均在仓库根目录执行。
