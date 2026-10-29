@@ -1,0 +1,4 @@
+interface:
+  display_name: "APIMoon"
+  short_description: "根据需求和代码生成接口测试，同步到 TestMoon，通过本机 Runner 执行并分析报告"
+  default_prompt: "使用 $apimoon，根据当前项目需求和代码生成接口测试，通过 TestMoon 执行并分析报告。"
