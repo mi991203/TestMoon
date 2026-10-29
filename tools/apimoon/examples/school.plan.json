@@ -1,0 +1,238 @@
+{
+  "version": 1,
+  "plan_id": "school-management-v1",
+  "source": {
+    "requirement": "创建学校和班级，查询后删除学校并确认班级被级联删除",
+    "code_ref": "fixtures/school_management"
+  },
+  "entries": [
+    {
+      "key": "environment",
+      "kind": "environment",
+      "name": "School 本地环境",
+      "document": {
+        "variables": {
+          "base_url": {
+            "value": "http://127.0.0.1:8096"
+          }
+        }
+      }
+    },
+    {
+      "key": "api-folder",
+      "kind": "folder",
+      "name": "School APIs",
+      "document": {
+        "kind": "api"
+      }
+    },
+    {
+      "key": "api.school-create",
+      "kind": "api",
+      "name": "school-create",
+      "document": {
+        "protocol": "http",
+        "request": {
+          "method": "POST",
+          "url": "{{base_url}}/api/school-management/v1/schools",
+          "body_type": "json",
+          "body": "{\"name\": \"APIMoon School\", \"address\": \"Test Road\"}"
+        }
+      },
+      "folder_id": "ref:api-folder"
+    },
+    {
+      "key": "api.class-create",
+      "kind": "api",
+      "name": "class-create",
+      "document": {
+        "protocol": "http",
+        "request": {
+          "method": "POST",
+          "url": "{{base_url}}/api/school-management/v1/classes",
+          "body_type": "json",
+          "body": "{\"name\": \"APIMoon Class\", \"school_id\": \"{{school_id}}\"}"
+        }
+      },
+      "folder_id": "ref:api-folder"
+    },
+    {
+      "key": "api.class-get",
+      "kind": "api",
+      "name": "class-get",
+      "document": {
+        "protocol": "http",
+        "request": {
+          "method": "GET",
+          "url": "{{base_url}}/api/school-management/v1/classes/{{class_id}}"
+        }
+      },
+      "folder_id": "ref:api-folder"
+    },
+    {
+      "key": "api.school-delete",
+      "kind": "api",
+      "name": "school-delete",
+      "document": {
+        "protocol": "http",
+        "request": {
+          "method": "DELETE",
+          "url": "{{base_url}}/api/school-management/v1/schools/{{school_id}}"
+        }
+      },
+      "folder_id": "ref:api-folder"
+    },
+    {
+      "key": "case.school-create",
+      "kind": "case",
+      "name": "school-create",
+      "document": {
+        "api_id": "ref:api.school-create",
+        "assertions": [
+          {
+            "source": "status",
+            "operator": "eq",
+            "expected": 200
+          }
+        ],
+        "extractions": [
+          {
+            "source": "json",
+            "path": "/id",
+            "variable": "school_id"
+          }
+        ]
+      }
+    },
+    {
+      "key": "case.class-create",
+      "kind": "case",
+      "name": "class-create",
+      "document": {
+        "api_id": "ref:api.class-create",
+        "assertions": [
+          {
+            "source": "status",
+            "operator": "eq",
+            "expected": 200
+          }
+        ],
+        "extractions": [
+          {
+            "source": "json",
+            "path": "/id",
+            "variable": "class_id"
+          }
+        ]
+      }
+    },
+    {
+      "key": "case.class-get",
+      "kind": "case",
+      "name": "class-get",
+      "document": {
+        "api_id": "ref:api.class-get",
+        "assertions": [
+          {
+            "source": "status",
+            "operator": "eq",
+            "expected": 200
+          }
+        ]
+      }
+    },
+    {
+      "key": "case.school-delete",
+      "kind": "case",
+      "name": "school-delete",
+      "document": {
+        "api_id": "ref:api.school-delete",
+        "assertions": [
+          {
+            "source": "status",
+            "operator": "eq",
+            "expected": 200
+          }
+        ]
+      }
+    },
+    {
+      "key": "case.class-missing",
+      "kind": "case",
+      "name": "class-missing",
+      "document": {
+        "api_id": "ref:api.class-get",
+        "assertions": [
+          {
+            "source": "status",
+            "operator": "eq",
+            "expected": 404
+          }
+        ]
+      }
+    },
+    {
+      "key": "scenario",
+      "kind": "scenario",
+      "name": "创建班级并清理学校",
+      "document": {
+        "steps": [
+          {
+            "id": "school-flow",
+            "kind": "folder",
+            "name": "School flow",
+            "children": [
+              {
+                "id": "school-create",
+                "name": "school-create",
+                "case_id": "ref:case.school-create"
+              },
+              {
+                "id": "class-create",
+                "name": "class-create",
+                "case_id": "ref:case.class-create"
+              },
+              {
+                "id": "class-get",
+                "name": "class-get",
+                "case_id": "ref:case.class-get"
+              },
+              {
+                "id": "school-delete",
+                "name": "school-delete",
+                "case_id": "ref:case.school-delete"
+              },
+              {
+                "id": "class-missing",
+                "name": "class-missing",
+                "case_id": "ref:case.class-missing"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "task",
+      "kind": "task",
+      "name": "School API 验收",
+      "document": {
+        "environment_id": "ref:environment",
+        "timeout_seconds": 120,
+        "items": [
+          {
+            "kind": "folder",
+            "name": "验收",
+            "children": [
+              {
+                "kind": "scenario",
+                "id": "ref:scenario",
+                "node_id": "school-scenario"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

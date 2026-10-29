@@ -3,7 +3,7 @@ GO ?= go
 PNPM ?= pnpm
 BIN := .local/bin
 SERVICES := identity core execution mock gateway
-.PHONY: tools generate deps build-go build-web build-all typecheck infra-up infra-down infra-status dev stop worker-image runner-image
+.PHONY: tools generate deps build-go build-apimoon build-web build-all typecheck infra-up infra-down infra-status dev stop worker-image runner-image
 tools:
 	mkdir -p .tools/bin
 	GOBIN=$(CURDIR)/.tools/bin $(GO) install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.12
@@ -15,7 +15,10 @@ generate:
 deps:
 	$(GO) mod download
 	$(PNPM) install --frozen-lockfile
-build-go:
+build-apimoon:
+	mkdir -p $(BIN)
+	$(GO) build -o $(BIN)/apimoon ./tools/apimoon/cmd
+build-go: build-apimoon
 	mkdir -p $(BIN)
 	$(GO) build -o $(BIN)/identity ./backend/platform/identity/cmd/server
 	$(GO) build -o $(BIN)/core ./backend/testing/core/cmd/server
