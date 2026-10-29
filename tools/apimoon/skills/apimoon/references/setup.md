@@ -4,7 +4,9 @@
 
 ## 安装预编译 APIMoon 和 Runner
 
-普通使用者无需 Go 或 Node。从 [GitHub Releases](https://github.com/mi991203/TestMoon/releases) 选择与平台兼容的 `apimoon-vX.Y.Z`，下载本机系统/架构对应的 `apimoon_vX.Y.Z_<系统>_<架构>.tar.gz` 和 `SHA256SUMS`。支持 macOS/Linux 的 amd64、arm64。
+普通使用者无需 Go 或 Node。从 [GitHub Releases](https://github.com/mi991203/TestMoon/releases) 选择与平台兼容的 `apimoon-vX.Y.Z`。支持 macOS、Linux、Windows 的 amd64、arm64。macOS/Linux 下载 `apimoon_vX.Y.Z_<系统>_<架构>.tar.gz` 和 `SHA256SUMS`；Windows 下载同架构的 `apimoon_vX.Y.Z_windows_<架构>.exe`、`testmoon-runner_vX.Y.Z_windows_<架构>.exe` 和 `SHA256SUMS`，无需解压。
+
+Windows 在 PowerShell 用 `Get-FileHash <文件> -Algorithm SHA256` 与 `SHA256SUMS` 比较；校验后重命名为 `apimoon.exe`、`testmoon-runner.exe`，将所在目录加入 PATH。CLI 命令相同。Worker 使用 Docker Desktop 的 Linux 容器，从同一发布标签源码的 `deploy/runner/worker.Dockerfile` 本地构建。具体 PowerShell 步骤见仓库 `tools/apimoon/distribution/README.md` 的 Windows 章节；下文解压、Bash 安装及 Runner 启动步骤适用于 macOS/Linux。
 
 用 `shasum -a 256 <安装包>` 或 `sha256sum <安装包>` 与校验文件中的对应行比较，解压后在安装包目录执行：
 

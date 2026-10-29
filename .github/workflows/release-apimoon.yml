@@ -43,15 +43,16 @@ jobs:
           echo "RELEASE_VERSION=${RELEASE_TAG#apimoon-}" >> "$GITHUB_ENV"
       - name: Test CLI and Runner
         run: go test -race ./tools/apimoon/... ./backend/testing/runner/... ./libs/go/buildinfo
-      - name: Build release archives
+      - name: Build release assets
         run: bash scripts/package-apimoon.sh "$RELEASE_VERSION" .local/release-dist
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          options=()
+          options=(--repo "$GITHUB_REPOSITORY" --verify-tag --generate-notes --title "APIMoon $RELEASE_VERSION")
           if [[ "$RELEASE_VERSION" == *-* ]]; then options+=(--prerelease); fi
-          gh release create "$RELEASE_TAG" .local/release-dist/*.tar.gz .local/release-dist/SHA256SUMS \
-            --repo "$GITHUB_REPOSITORY" --verify-tag --generate-notes \
-            --title "APIMoon $RELEASE_VERSION" "${options[@]}"
+          shopt -s nullglob
+          assets=(.local/release-dist/*.tar.gz .local/release-dist/*.exe)
+          test "${#assets[@]}" -gt 0
+          gh release create "$RELEASE_TAG" "${assets[@]}" .local/release-dist/SHA256SUMS "${options[@]}"

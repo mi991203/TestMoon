@@ -1,10 +1,10 @@
 # APIMoon 与本机 Runner
 
-本发布包包含当前操作系统/架构的 `apimoon` 和 `testmoon-runner`，以及程序安装脚本和 Worker 构建脚本。Skill 已内嵌在 APIMoon 可执行文件中。使用者无需安装 Go 或 Node。构建及运行 Worker 需要已启动的 Docker。
+支持 macOS、Linux、Windows 的 amd64、arm64。macOS/Linux 发布包包含 `apimoon`、`testmoon-runner`、安装脚本和 Worker 构建脚本；Windows 直接提供 APIMoon、Runner 两个独立 `.exe`，没有压缩包。Skill 已内嵌在 APIMoon 中。使用者无需安装 Go 或 Node。构建及运行 Worker 需要已启动的 Docker。
 
 ## 安装预编译程序
 
-从 GitHub Releases 下载本机对应的 `.tar.gz` 和 `SHA256SUMS`，用 `shasum -a 256 <安装包>` 或 `sha256sum <安装包>` 与校验文件中的对应行比较，再解压。
+macOS/Linux 从 GitHub Releases 下载本机对应的 `.tar.gz` 和 `SHA256SUMS`，用 `shasum -a 256 <安装包>` 或 `sha256sum <安装包>` 与校验文件中的对应行比较，再解压。Windows 使用下节步骤。
 
 在解压目录执行：
 
@@ -17,6 +17,43 @@ apimoon skill install --agent codex --global
 ```
 
 默认安装两个程序到 `~/.local/bin`。自定义程序目录使用 `bash install.sh /自定义/bin`。需要在新终端或 Agent 中调用时，将程序目录加入对应 PATH。
+
+## Windows 使用与本地 Worker
+
+从同一个 Release 下载本机架构的两个 `.exe` 和 `SHA256SUMS`，例如 x86-64 使用 `apimoon_v0.1.2_windows_amd64.exe`、`testmoon-runner_v0.1.2_windows_amd64.exe`；ARM64 选择 `arm64`。以下版本号需替换为实际发布版本。
+
+在 PowerShell 中校验下载文件，对比 `SHA256SUMS` 中对应的哈希值，校验通过后再重命名运行：
+
+```powershell
+Get-FileHash .\apimoon_v0.1.2_windows_amd64.exe -Algorithm SHA256
+Get-FileHash .\testmoon-runner_v0.1.2_windows_amd64.exe -Algorithm SHA256
+Get-Content .\SHA256SUMS
+Rename-Item .\apimoon_v0.1.2_windows_amd64.exe apimoon.exe
+Rename-Item .\testmoon-runner_v0.1.2_windows_amd64.exe testmoon-runner.exe
+.\apimoon.exe version
+.\testmoon-runner.exe --version
+.\apimoon.exe skill install --agent codex --global
+```
+
+将两个程序所在目录加入用户 PATH 后，可直接调用 `apimoon`、`testmoon-runner`。构建 Worker 时启动 Docker Desktop，使用 Linux 容器模式；通过 Git 获取同一发布标签的源码，在容器内构建，无需宿主机 Go 或 Node：
+
+```powershell
+git clone --branch apimoon-v0.1.2 --depth 1 https://github.com/mi991203/TestMoon.git TestMoon-v0.1.2
+docker build -f .\TestMoon-v0.1.2\deploy\runner\worker.Dockerfile -t testmoon/worker:0.1.2 .\TestMoon-v0.1.2
+```
+
+连接平台的 CLI 命令与下文相同。启动 Runner 前，用 PowerShell 设置环境变量（以下使用已加入 PATH 的程序）：
+
+```powershell
+$env:TESTMOON_URL = 'https://testmoon.example.com'
+$env:TESTMOON_WORKER_IMAGE = 'testmoon/worker:0.1.2'
+$env:TESTMOON_RUNNER_STATE = "$HOME/.api_moon/runner/state.json"
+# 首次注册时填写平台签发的一次性凭证；已有状态时省略。
+$env:TESTMOON_ENROLLMENT_TOKEN = Read-Host 'Runner enrollment token' -MaskInput
+testmoon-runner
+```
+
+`-MaskInput` 需要 PowerShell 7.1+；也可由 Agent 通过子进程环境传入凭证。保持 Runner 终端运行，后续启动使用相同状态文件，无需再次输入注册凭证。
 
 ## 安装 Codex / Trae Skill
 
@@ -36,7 +73,7 @@ apimoon skill install --agent trae-cn --global
 
 ## 本地构建 Worker
 
-在解压目录执行：
+macOS/Linux 在解压目录执行（Windows 见上节）：
 
 ```bash
 bash build-worker.sh
@@ -65,7 +102,7 @@ apimoon project list
 apimoon config set context.project_id <项目ID>
 ```
 
-在解压目录的独立 Bash 终端中启动预编译 Runner：
+macOS/Linux 在解压目录的独立 Bash 终端中启动预编译 Runner（Windows 见上节）：
 
 ```bash
 release_version="$(cat VERSION)"

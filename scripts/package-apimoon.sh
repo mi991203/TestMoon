@@ -16,12 +16,25 @@ metadata=github.com/mi991203/TestMoon/libs/go/buildinfo
 flags="-s -w -X $metadata.Version=$version -X $metadata.Commit=$commit -X $metadata.Date=$date"
 temporary="$(mktemp -d "${TMPDIR:-/tmp}/apimoon-release.XXXXXX")"
 trap 'rm -rf "$temporary"' EXIT
-targets="${APIMOON_RELEASE_TARGETS:-darwin/amd64 darwin/arm64 linux/amd64 linux/arm64}"
+targets="${APIMOON_RELEASE_TARGETS:-darwin/amd64 darwin/arm64 linux/amd64 linux/arm64 windows/amd64 windows/arm64}"
 for target in $targets; do
-  case "$target" in darwin/amd64|darwin/arm64|linux/amd64|linux/arm64);; *) echo "Unsupported target: $target" >&2; exit 2;; esac
+  case "$target" in darwin/amd64|darwin/arm64|linux/amd64|linux/arm64|windows/amd64|windows/arm64);; *) echo "Unsupported target: $target" >&2; exit 2;; esac
+done
+assets=()
+for target in $targets; do
   goos="${target%/*}"
   goarch="${target#*/}"
   name="apimoon_${version}_${goos}_${goarch}"
+  if [[ "$goos" == windows ]]; then
+    runner_name="testmoon-runner_${version}_${goos}_${goarch}.exe"
+    [[ ! -e "$output/$name.exe" && ! -e "$output/$runner_name" ]] || { echo "Windows executable already exists for $target; choose a new directory." >&2; exit 1; }
+    echo "Building APIMoon and Runner for $target"
+    CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" "${GO:-go}" build -trimpath -ldflags "$flags" -o "$temporary/$name.exe" ./tools/apimoon/cmd
+    CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" "${GO:-go}" build -trimpath -ldflags "$flags" -o "$temporary/$runner_name" ./backend/testing/runner/cmd/runner
+    mv "$temporary/$name.exe" "$temporary/$runner_name" "$output/"
+    assets+=("$name.exe" "$runner_name")
+    continue
+  fi
   archive="$output/$name.tar.gz"
   [[ ! -e "$archive" ]] || { echo "Archive already exists: $archive" >&2; exit 1; }
   package="$temporary/$name"
@@ -35,13 +48,14 @@ for target in $targets; do
   printf '%s\n' "$repository" > "$package/REPOSITORY"
   chmod 755 "$package/apimoon" "$package/testmoon-runner" "$package/install.sh" "$package/build-worker.sh"
   COPYFILE_DISABLE=1 tar -czf "$archive" -C "$temporary" "$name"
+  assets+=("$name.tar.gz")
 done
 (
   cd "$output"
   if command -v sha256sum >/dev/null; then
-    sha256sum ./*.tar.gz > SHA256SUMS
+    sha256sum "${assets[@]}" > SHA256SUMS
   else
-    shasum -a 256 ./*.tar.gz > SHA256SUMS
+    shasum -a 256 "${assets[@]}" > SHA256SUMS
   fi
 )
-echo "Release archives and checksums: $output"
+echo "Release assets and checksums: $output"

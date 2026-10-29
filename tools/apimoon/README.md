@@ -4,7 +4,7 @@
 
 ## 从 GitHub Releases 安装
 
-普通使用者下载预编译 APIMoon、Runner，并在本机 Docker 中构建 Worker，无需安装 Go 或 Node。发布包支持 macOS/Linux 的 amd64、arm64；需要 Bash、curl、tar，运行测试需要已启动的 Docker。
+普通使用者下载预编译 APIMoon、Runner，并在本机 Docker 中构建 Worker，无需安装 Go 或 Node。支持 macOS、Linux、Windows 的 amd64、arm64；macOS/Linux 提供 `.tar.gz`，Windows 直接提供两个 `.exe`。运行测试需要已启动的 Docker。
 
 在 [GitHub Releases](https://github.com/mi991203/TestMoon/releases) 选择与平台兼容的 `apimoon-vX.Y.Z` 发布，下载对应系统和架构的 `apimoon_vX.Y.Z_<系统>_<架构>.tar.gz` 及 `SHA256SUMS`。例如 Apple Silicon 使用 `darwin_arm64`，Linux x86-64 使用 `linux_amd64`。
 
@@ -21,7 +21,7 @@ testmoon-runner --version
 
 默认安装两个程序到 `~/.local/bin`；自定义目录使用 `bash install.sh /自定义/bin`。将该目录加入终端及 Agent 的 PATH。安装或升级保留 `~/.api_moon/` 中的登录、作用域、同步状态和 Runner 状态。
 
-CLI 内嵌 Skill，发布包还包含 Worker 构建脚本以及 `VERSION`、`COMMIT`、`REPOSITORY`。保留解压目录以便构建 Worker；程序安装后可在任意业务项目中调用。安装流程详见 [发布包使用说明](distribution/README.md)。发布配置已提供，实际下载需等待维护者发布首个 Release，不能把示例版本视为已经可下载。
+CLI 内嵌 Skill，macOS/Linux 发布包还包含 Worker 构建脚本以及 `VERSION`、`COMMIT`、`REPOSITORY`。保留解压目录以便构建 Worker；程序安装后可在任意业务项目中调用。Windows 下载相同架构的 `apimoon_vX.Y.Z_windows_<架构>.exe`、`testmoon-runner_vX.Y.Z_windows_<架构>.exe` 及 `SHA256SUMS`，校验后可重命名为 `apimoon.exe`、`testmoon-runner.exe` 并加入 PATH，无需解压。PowerShell 安装及 Worker 构建步骤见 [发布产物使用说明](distribution/README.md)。示例版本号需替换为实际已发布版本。
 
 ## 通过 APIMoon 安装 Agent Skill
 
@@ -82,7 +82,7 @@ apimoon context show
 
 `auth login` 读取 stdin 至 EOF；交互输入后按 Ctrl+D，也可由 Agent 通过子进程 stdin 传入。使用现有用户登录会话（Cookie + CSRF）；密码不落盘。需要预先在平台创建组织、项目和 Runner，并为登录用户授予相应项目权限。
 
-本机 Docker 启动后，在发布包解压目录构建 Worker：
+macOS/Linux 本机 Docker 启动后，在发布包解压目录构建 Worker（Windows 见 [使用说明](distribution/README.md#windows-使用与本地-worker)）：
 
 ```bash
 bash build-worker.sh
@@ -264,7 +264,7 @@ apimoon_windows_arm64.exe
 make release-apimoon APIMOON_VERSION=v0.1.0
 ```
 
-会交叉编译四组内置 Skill 的 APIMoon 及 Runner，打包 Worker 构建脚本并生成 `SHA256SUMS`。`APIMOON_RELEASE_TARGETS=darwin/arm64` 可限制本地验证的平台；正式发布工作流构建全部四组。
+会交叉编译六个平台的 APIMoon 及 Runner：macOS/Linux 为四个 `.tar.gz`（含程序和 Worker 构建脚本），Windows 为四个独立 `.exe`（两个架构各有 APIMoon、Runner），并生成覆盖全部附件的 `SHA256SUMS`。Windows 文件名为 `apimoon_vX.Y.Z_windows_<架构>.exe`、`testmoon-runner_vX.Y.Z_windows_<架构>.exe`。`APIMOON_RELEASE_TARGETS="windows/amd64 windows/arm64"` 可限制本地验证的平台；正式发布工作流构建全部六个平台。
 
 `.github/workflows/release-apimoon.yml` 在推送 `apimoon-vX.Y.Z` 标签时，先执行 CLI/Runner 测试，再构建并上传 GitHub Release 附件；也可通过 Actions 手动选择一个已存在的标签发布。测试版标签使用 `apimoon-vX.Y.Z-rc.1`，工作流会标为 prerelease。
 
