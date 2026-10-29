@@ -120,6 +120,7 @@ unset TESTMOON_ENROLLMENT_TOKEN
 
 ## 参考文档
 
+- [APIMoon CLI](tools/apimoon/README.md)（Agent 生成计划、同步、执行及报告读取）
 - [学生管理测试服务](fixtures/school_management/README.md)（独立启动，提供 HTTP/gRPC CRUD）
 - [需求与验收](docs/requirements/README.md)
 - [项目结构与技术选型](docs/architecture/项目结构与技术选型.md)

@@ -1,0 +1,9 @@
+base_url: http://localhost:18080
+http_timeout_seconds: 30
+# auth 由 apimoon auth login 写入，勿将真实凭证提交到 Git。
+auth: {}
+context:
+  org_id: ""
+  project_id: ""
+  environment_id: ""
+  runner_id: ""

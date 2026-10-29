@@ -1,0 +1,768 @@
+{
+  "$defs": {
+    "testmoon.testing.contracts.v1.APIDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "environment_id": {
+          "type": "string"
+        },
+        "protocol": {
+          "const": "http"
+        },
+        "request": {
+          "$ref": "#/$defs/testmoon.testing.contracts.v1.HTTPRequest"
+        },
+        "runner_id": {
+          "type": "string"
+        },
+        "schema": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "protocol",
+        "request"
+      ],
+      "type": "object"
+    },
+    "testmoon.testing.contracts.v1.Assertion": {
+      "additionalProperties": false,
+      "properties": {
+        "expected": {},
+        "operator": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "operator"
+      ],
+      "type": "object"
+    },
+    "testmoon.testing.contracts.v1.Auth": {
+      "additionalProperties": false,
+      "properties": {
+        "in": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "testmoon.testing.contracts.v1.EnvironmentDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "variables": {
+          "additionalProperties": {
+            "$ref": "#/$defs/testmoon.testing.contracts.v1.Variable"
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "testmoon.testing.contracts.v1.Extraction": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "secret": {
+          "type": "boolean"
+        },
+        "source": {
+          "type": "string"
+        },
+        "variable": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "variable"
+      ],
+      "type": "object"
+    },
+    "testmoon.testing.contracts.v1.FolderDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "testmoon.testing.contracts.v1.HTTPRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "auth": {
+          "$ref": "#/$defs/testmoon.testing.contracts.v1.Auth"
+        },
+        "body": {
+          "type": "string"
+        },
+        "body_type": {
+          "type": "string"
+        },
+        "headers": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "method": {
+          "type": "string"
+        },
+        "query": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "timeout_ms": {
+          "type": "integer"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "method",
+        "url"
+      ],
+      "type": "object"
+    },
+    "testmoon.testing.contracts.v1.Operation": {
+      "additionalProperties": false,
+      "properties": {
+        "script": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "type",
+        "version",
+        "script"
+      ],
+      "type": "object"
+    },
+    "testmoon.testing.contracts.v1.RequestPatch": {
+      "additionalProperties": false,
+      "properties": {
+        "auth": {
+          "$ref": "#/$defs/testmoon.testing.contracts.v1.Auth"
+        },
+        "body": {
+          "type": "string"
+        },
+        "body_type": {
+          "type": "string"
+        },
+        "headers": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "method": {
+          "type": "string"
+        },
+        "query": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "testmoon.testing.contracts.v1.ScenarioDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "collection_variables": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "name": {
+          "type": "string"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/testmoon.testing.contracts.v1.ScenarioStep"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "steps"
+      ],
+      "type": "object"
+    },
+    "testmoon.testing.contracts.v1.ScenarioStep": {
+      "additionalProperties": false,
+      "properties": {
+        "case_id": {
+          "type": "string"
+        },
+        "children": {
+          "items": {
+            "$ref": "#/$defs/testmoon.testing.contracts.v1.ScenarioStep"
+          },
+          "type": "array"
+        },
+        "continue_on_failure": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "inline": {
+          "$ref": "#/$defs/testmoon.testing.contracts.v1.TestCaseDefinition"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "override": {
+          "$ref": "#/$defs/testmoon.testing.contracts.v1.RequestPatch"
+        },
+        "variables": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "testmoon.testing.contracts.v1.Selection": {
+      "additionalProperties": false,
+      "properties": {
+        "children": {
+          "items": {
+            "$ref": "#/$defs/testmoon.testing.contracts.v1.Selection"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "node_id": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "testmoon.testing.contracts.v1.TaskDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "environment_id": {
+          "type": "string"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/testmoon.testing.contracts.v1.Selection"
+          },
+          "type": "array"
+        },
+        "runner_id": {
+          "type": "string"
+        },
+        "timeout_seconds": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object"
+    },
+    "testmoon.testing.contracts.v1.TestCaseDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "after": {
+          "items": {
+            "$ref": "#/$defs/testmoon.testing.contracts.v1.Operation"
+          },
+          "type": "array"
+        },
+        "api_id": {
+          "type": "string"
+        },
+        "assertions": {
+          "items": {
+            "$ref": "#/$defs/testmoon.testing.contracts.v1.Assertion"
+          },
+          "type": "array"
+        },
+        "before": {
+          "items": {
+            "$ref": "#/$defs/testmoon.testing.contracts.v1.Operation"
+          },
+          "type": "array"
+        },
+        "collection_variables": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "environment_id": {
+          "type": "string"
+        },
+        "extractions": {
+          "items": {
+            "$ref": "#/$defs/testmoon.testing.contracts.v1.Extraction"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        },
+        "override": {
+          "$ref": "#/$defs/testmoon.testing.contracts.v1.RequestPatch"
+        },
+        "request": {
+          "$ref": "#/$defs/testmoon.testing.contracts.v1.HTTPRequest"
+        },
+        "runner_id": {
+          "type": "string"
+        },
+        "variables": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "testmoon.testing.contracts.v1.Variable": {
+      "additionalProperties": false,
+      "properties": {
+        "secret": {
+          "type": "boolean"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "entries": {
+      "items": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "dependentRequired": {
+              "id": [
+                "revision"
+              ],
+              "revision": [
+                "id"
+              ]
+            },
+            "properties": {
+              "document": {
+                "$ref": "#/$defs/testmoon.testing.contracts.v1.APIDefinition"
+              },
+              "folder_id": {
+                "type": "string"
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "key": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "kind": {
+                "const": "api"
+              },
+              "name": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "revision": {
+                "oneOf": [
+                  {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "pattern": "^[1-9][0-9]*$",
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "key",
+              "kind",
+              "name",
+              "document"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "dependentRequired": {
+              "id": [
+                "revision"
+              ],
+              "revision": [
+                "id"
+              ]
+            },
+            "properties": {
+              "document": {
+                "$ref": "#/$defs/testmoon.testing.contracts.v1.TestCaseDefinition"
+              },
+              "folder_id": {
+                "type": "string"
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "key": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "kind": {
+                "const": "case"
+              },
+              "name": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "revision": {
+                "oneOf": [
+                  {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "pattern": "^[1-9][0-9]*$",
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "key",
+              "kind",
+              "name",
+              "document"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "dependentRequired": {
+              "id": [
+                "revision"
+              ],
+              "revision": [
+                "id"
+              ]
+            },
+            "properties": {
+              "document": {
+                "$ref": "#/$defs/testmoon.testing.contracts.v1.ScenarioDefinition"
+              },
+              "folder_id": {
+                "type": "string"
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "key": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "kind": {
+                "const": "scenario"
+              },
+              "name": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "revision": {
+                "oneOf": [
+                  {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "pattern": "^[1-9][0-9]*$",
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "key",
+              "kind",
+              "name",
+              "document"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "dependentRequired": {
+              "id": [
+                "revision"
+              ],
+              "revision": [
+                "id"
+              ]
+            },
+            "properties": {
+              "document": {
+                "$ref": "#/$defs/testmoon.testing.contracts.v1.TaskDefinition"
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "key": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "kind": {
+                "const": "task"
+              },
+              "name": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "revision": {
+                "oneOf": [
+                  {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "pattern": "^[1-9][0-9]*$",
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "key",
+              "kind",
+              "name",
+              "document"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "dependentRequired": {
+              "id": [
+                "revision"
+              ],
+              "revision": [
+                "id"
+              ]
+            },
+            "properties": {
+              "document": {
+                "$ref": "#/$defs/testmoon.testing.contracts.v1.EnvironmentDefinition"
+              },
+              "folder_id": {
+                "type": "string"
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "key": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "kind": {
+                "const": "environment"
+              },
+              "name": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "revision": {
+                "oneOf": [
+                  {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "pattern": "^[1-9][0-9]*$",
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "key",
+              "kind",
+              "name",
+              "document"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "dependentRequired": {
+              "id": [
+                "revision"
+              ],
+              "revision": [
+                "id"
+              ]
+            },
+            "properties": {
+              "document": {
+                "$ref": "#/$defs/testmoon.testing.contracts.v1.FolderDefinition"
+              },
+              "folder_id": {
+                "type": "string"
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "key": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "kind": {
+                "const": "folder"
+              },
+              "name": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "revision": {
+                "oneOf": [
+                  {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "pattern": "^[1-9][0-9]*$",
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "key",
+              "kind",
+              "name",
+              "document"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 2000,
+      "minItems": 1,
+      "type": "array"
+    },
+    "plan_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "type": "string"
+    },
+    "source": {
+      "additionalProperties": false,
+      "properties": {
+        "code_ref": {
+          "type": "string"
+        },
+        "requirement": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "version",
+    "plan_id",
+    "entries"
+  ],
+  "title": "APIMoon TestPlan v1",
+  "type": "object"
+}
