@@ -4,7 +4,7 @@
 
 ## 从 GitHub Releases 安装
 
-APIMoon 和 Runner 均由 GitHub Actions 编译并在 [GitHub Releases](https://github.com/mi991203/TestMoon/releases) 独立提供下载，用户不需要构建任何 Go 程序。只有 Worker 镜像在本机 Docker 内构建。
+APIMoon 和 Runner 均由 GitHub Actions 编译并在 [GitHub Releases](https://github.com/mi991203/TestMoon/releases) 独立提供下载；Worker 从 Docker Hub 拉取 `flyingcode/testmoon-worker:0.1.0`。用户只需 Docker，无需下载源码或安装 Git、Go、Node。
 
 支持 macOS、Linux、Windows 的 amd64、arm64。每个系统/架构下载同版本的两个文件和 `SHA256SUMS`，不使用压缩包：
 
@@ -69,23 +69,23 @@ apimoon project list
 apimoon config set context.project_id <项目ID>
 apimoon runner list
 apimoon config set context.runner_id <RunnerID>
-# 按需设置默认环境：
+# 按需选择已有环境：
+apimoon environment list
 apimoon config set context.environment_id <环境ID>
 apimoon context show
 ```
 
-`auth login` 读取 stdin 至 EOF；交互输入后按 Ctrl+D，也可由 Agent 通过子进程 stdin 传入。使用现有用户登录会话（Cookie + CSRF）；密码不落盘。需要预先在平台创建组织、项目和 Runner，并为登录用户授予相应项目权限。
+`auth login` 读取 stdin 至 EOF；Mac/Windows 隐藏密码输入的完整命令见 [配置 APIMoon](distribution/README.md#配置-apimoon)，Agent 也可通过子进程 stdin 传入。使用现有用户登录会话（Cookie + CSRF）；密码不落盘。需要预先在平台创建组织、项目和 Runner，并为登录用户授予相应项目权限。
 
-本机 Docker 启动后，使用 Git 获取同一发布标签的源码，只构建 Worker（示例版本需替换）：
+本机 Docker 启动后，拉取 Worker：
 
 ```bash
-git clone --branch apimoon-v0.1.3 --depth 1 https://github.com/mi991203/TestMoon.git TestMoon-v0.1.3
-docker build -f TestMoon-v0.1.3/deploy/runner/worker.Dockerfile -t testmoon/worker:0.1.3 TestMoon-v0.1.3
+docker pull flyingcode/testmoon-worker:0.1.0
 ```
 
-宿主机需要 Git、Docker，无需 Go、Node。Windows Docker Desktop 使用 Linux 容器模式；PowerShell 命令见 [使用说明](distribution/README.md)。源码只用于 Worker 镜像，Runner 始终使用 Release 下载的程序。
+Windows Docker Desktop 使用 Linux 容器模式；PowerShell 命令见 [使用说明](distribution/README.md)。APIMoon/Runner 的 Release 版本与 Worker 镜像版本分别管理，不能根据 CLI 版本推导镜像标签。
 
-`testmoon-runner` 使用该镜像创建执行容器；启动前显式设置 `TESTMOON_WORKER_IMAGE` 为构建得到的标签。首次启动使用项目私有节点的一次性注册凭证，详细前台启动步骤见 [本机 Runner 接入](skills/apimoon/references/setup.md)。当前 APIMoon 的 Runner 命令仅支持 `runner list`，本机 Runner 的自动注册和进程管理尚未接入 CLI。
+`testmoon-runner` 使用该镜像创建执行容器；启动前显式设置 `TESTMOON_WORKER_IMAGE=flyingcode/testmoon-worker:0.1.0`。当前程序默认镜像仍是 `testmoon/worker:0.1.0`，不能省略该配置。首次启动使用项目私有节点的一次性注册凭证，详细步骤见 [安装及 Runner 启动说明](distribution/README.md)。当前 APIMoon 的 Runner 命令仅支持 `runner list`，本机 Runner 的自动注册和进程管理尚未接入 CLI。
 
 默认配置为 `~/.api_moon/config.yaml`，可通过 `--config FILE` 指定；[配置示例](examples/config.yaml)。配置与同步状态原子写入，文件权限为 `0600`，新建目录为 `0700`。`config show` 隐去会话凭证；会话到期后重新登录，改变 `base_url` 会清除鉴权信息。切换组织清除项目、环境、Runner；切换项目清除环境、Runner。
 
@@ -270,4 +270,15 @@ git tag apimoon-v0.1.0
 git push origin apimoon-v0.1.0
 ```
 
-版本、提交和构建时间通过链接参数写入两个程序。正式标签的源码即 Worker 的构建来源；不要移动已发布标签或混用其他提交的 Worker 源码。
+版本、提交和构建时间通过链接参数写入两个程序。Worker 由维护者使用对应源码单独构建并发布到 Docker Hub，用户只拉取已发布镜像；不要移动已发布标签或覆盖已有镜像版本。当前 GitHub Release 工作流不负责推送 Worker 镜像。
+
+首次在 Docker Hub 创建公开仓库 `flyingcode/testmoon-worker` 后，在仓库根目录发布：
+
+```bash
+docker login --username flyingcode
+# 首次创建构建器；已存在时改用 docker buildx use testmoon-builder。
+docker buildx create --name testmoon-builder --driver docker-container --use
+docker buildx inspect --bootstrap
+docker buildx build --platform linux/amd64,linux/arm64 -f deploy/runner/worker.Dockerfile -t flyingcode/testmoon-worker:0.1.0 --push .
+docker buildx imagetools inspect flyingcode/testmoon-worker:0.1.0
+```

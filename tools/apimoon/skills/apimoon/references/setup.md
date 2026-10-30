@@ -13,7 +13,7 @@ Windows 在文件名末尾增加 `.exe`。同时下载 `SHA256SUMS`，用 `shasu
 
 macOS/Linux 校验后，用 `install -m 755` 将两文件安装到 `~/.local/bin/apimoon`、`~/.local/bin/testmoon-runner`，将该目录加入 PATH。Windows 重命名为 `apimoon.exe`、`testmoon-runner.exe` 并加入 PATH。分别执行 `apimoon version`、`testmoon-runner --version` 确认程序可用；直接运行 Runner 前先准备下述参数。
 
-Skill 已内嵌在 APIMoon 中，无需安装脚本或源码。只有 Worker 使用 Git 获取同一发布标签的源码并通过 Docker 构建，不在宿主机编译 Go。没有已发布附件时说明发布未完成，不要把示例版本视为可下载版本。
+Skill 已内嵌在 APIMoon 中，无需安装脚本或源码。Worker 从 Docker Hub 拉取，用户无需 Git、Go、Node。没有已发布附件时说明发布未完成，不要把示例版本视为可下载版本。
 
 升级保留 `~/.api_moon/` 配置、同步记录和 Runner 状态，先等待任务结束并停止旧 Runner。
 
@@ -34,18 +34,35 @@ apimoon config set context.environment_id <环境ID>
 
 配置已存在时先用 `config show` 查看脱敏内容，保留用户已有的服务地址和作用域。更换组织会清除项目、环境及 Runner；更换项目会清除环境及 Runner。环境可由计划创建，也可引用已有环境。
 
-`auth login` 从 stdin 读取至 EOF；交互输入后按 Ctrl+D，自动化调用通过子进程 stdin 提供用户给定的密码。登录会话过期后重新登录。
-
-## 本地构建 Worker
-
-前置条件：Git、Docker 已安装并启动；Windows Docker Desktop 使用 Linux 容器模式。只构建 Worker，版本替换为已下载的 Runner 版本：
+`auth login` 从 stdin 读取至 EOF，自动化调用通过子进程 stdin 提供用户给定的密码。Mac 默认 zsh 隐藏输入密码：
 
 ```bash
-git clone --branch apimoon-v0.1.3 --depth 1 https://github.com/mi991203/TestMoon.git TestMoon-v0.1.3
-docker build -f TestMoon-v0.1.3/deploy/runner/worker.Dockerfile -t testmoon/worker:0.1.3 TestMoon-v0.1.3
+read -r -s 'APIMOON_PASSWORD?TestMoon 登录密码：'
+echo
+printf '%s' "$APIMOON_PASSWORD" | apimoon auth login --username '你的用户名' --password-stdin
+unset APIMOON_PASSWORD
 ```
 
-上面使用正斜杠路径，在 Bash 和 PowerShell 均可执行。Go/Node 构建发生在容器内，用户无需安装这些工具。启动 Runner 时使用相同的 `TESTMOON_WORKER_IMAGE`。
+Windows PowerShell：
+
+```powershell
+$password = Read-Host 'TestMoon 登录密码' -AsSecureString
+$OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+[System.Net.NetworkCredential]::new('', $password).Password | apimoon auth login --username '你的用户名' --password-stdin
+Remove-Variable password
+```
+
+登录会话过期后重新登录。默认配置保存在 `~/.api_moon/config.yaml`，登录凭证由 CLI 写入，不要手工填写；平台账号密码与 Runner 的一次性注册凭证用途不同。
+
+## 拉取 Worker
+
+前置条件：Docker 已安装并启动；Windows Docker Desktop 使用 Linux 容器模式。
+
+```bash
+docker pull flyingcode/testmoon-worker:0.1.0
+```
+
+Mac、Linux 和 PowerShell 使用相同命令，Docker 自动选择匹配架构。Worker 镜像版本与 APIMoon/Runner 的 Release 版本分别管理；当前使用 `0.1.0`，不能按 CLI 版本拼接镜像标签。当前 Runner 默认地址仍为 `testmoon/worker:0.1.0`，必须显式配置下面的 Docker Hub 地址。
 
 ## 启动本机私有 Runner
 
@@ -53,7 +70,7 @@ docker build -f TestMoon-v0.1.3/deploy/runner/worker.Dockerfile -t testmoon/work
 
 ```bash
 export TESTMOON_URL='https://testmoon.example.com'
-export TESTMOON_WORKER_IMAGE='testmoon/worker:0.1.3'
+export TESTMOON_WORKER_IMAGE='flyingcode/testmoon-worker:0.1.0'
 export TESTMOON_RUNNER_STATE="$HOME/.api_moon/runner/state.json"
 export DOCKER_HOST="${DOCKER_HOST:-$(docker context inspect --format '{{.Endpoints.docker.Host}}')}"
 docker info >/dev/null
