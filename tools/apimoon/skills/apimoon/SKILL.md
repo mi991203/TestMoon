@@ -28,7 +28,7 @@ apimoon runner list
 - CLI 默认读取 `~/.api_moon/config.yaml`；可用 `--config FILE` 选择其他配置。查看配置使用 `config show`，它会隐藏登录凭证。
 - 使用用户选定的组织、项目和环境。本机服务选择属于当前项目的在线私有 Runner；`localhost` 指 Runner 所在机器。
 - 若 CLI、登录或本机 Runner 未就绪，读取 [references/setup.md](references/setup.md)。当前 `runner list` 查询平台状态，本机 Runner 使用独立程序启动。
-- 普通使用者从 GitHub Releases 下载预编译 APIMoon、Runner，无需本机 Go。Worker 通过发布包的 `build-worker.sh` 下载对应源码并在本机 Docker 中构建；本机组件尚未就绪时按接入文档准备。
+- 普通使用者从 GitHub Releases 下载预编译 APIMoon、Runner，并从 Docker Hub 拉取 `flyingcode/testmoon-worker:0.1.0`；无需下载源码或安装 Go。启动 Runner 时显式设置 `TESTMOON_WORKER_IMAGE` 为该地址；Worker 标签与 CLI 版本分别管理。本机组件尚未就绪时按接入文档准备。
 - 密码仅通过 `auth login --password-stdin` 提供；不要把密码、会话 Cookie、CSRF 或 Runner 凭证写入计划、日志或回复。
 
 ## 从需求和代码生成计划

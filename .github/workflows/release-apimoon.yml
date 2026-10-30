@@ -52,7 +52,10 @@ jobs:
         run: |
           options=(--repo "$GITHUB_REPOSITORY" --verify-tag --generate-notes --title "APIMoon $RELEASE_VERSION")
           if [[ "$RELEASE_VERSION" == *-* ]]; then options+=(--prerelease); fi
-          shopt -s nullglob
-          assets=(.local/release-dist/*.tar.gz .local/release-dist/*.exe)
+          (cd .local/release-dist && sha256sum --check SHA256SUMS)
+          assets=()
+          while read -r checksum asset; do
+            assets+=(".local/release-dist/$asset")
+          done < .local/release-dist/SHA256SUMS
           test "${#assets[@]}" -gt 0
           gh release create "$RELEASE_TAG" "${assets[@]}" .local/release-dist/SHA256SUMS "${options[@]}"

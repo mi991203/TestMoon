@@ -129,7 +129,7 @@ services:
       TESTMOON_EXECUTION_HTTP: execution:8093
       TESTMOON_MOCK_HTTP: mock:8094
       TESTMOON_MOCK_PUBLIC_HTTP: mock:8095
-    ports: ["127.0.0.1:${GATEWAY_PORT:-18080}:18080"]
+    ports: ["0.0.0.0:${GATEWAY_PORT:-18080}:18080"]
     depends_on:
       identity: {condition: service_healthy}
       core: {condition: service_healthy}

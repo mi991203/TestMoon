@@ -4,24 +4,18 @@
 
 ## 安装预编译 APIMoon 和 Runner
 
-普通使用者无需 Go 或 Node。从 [GitHub Releases](https://github.com/mi991203/TestMoon/releases) 选择与平台兼容的 `apimoon-vX.Y.Z`。支持 macOS、Linux、Windows 的 amd64、arm64。macOS/Linux 下载 `apimoon_vX.Y.Z_<系统>_<架构>.tar.gz` 和 `SHA256SUMS`；Windows 下载同架构的 `apimoon_vX.Y.Z_windows_<架构>.exe`、`testmoon-runner_vX.Y.Z_windows_<架构>.exe` 和 `SHA256SUMS`，无需解压。
+APIMoon 和 Runner 均由维护者在 GitHub Actions 编译，用户从 [GitHub Releases](https://github.com/mi991203/TestMoon/releases) 分别下载，不自行构建。支持 macOS、Linux、Windows 的 amd64、arm64，全部为独立可执行文件，无压缩包：
 
-Windows 在 PowerShell 用 `Get-FileHash <文件> -Algorithm SHA256` 与 `SHA256SUMS` 比较；校验后重命名为 `apimoon.exe`、`testmoon-runner.exe`，将所在目录加入 PATH。CLI 命令相同。Worker 使用 Docker Desktop 的 Linux 容器，从同一发布标签源码的 `deploy/runner/worker.Dockerfile` 本地构建。具体 PowerShell 步骤见仓库 `tools/apimoon/distribution/README.md` 的 Windows 章节；下文解压、Bash 安装及 Runner 启动步骤适用于 macOS/Linux。
+- `apimoon_vX.Y.Z_<系统>_<架构>`
+- `testmoon-runner_vX.Y.Z_<系统>_<架构>`
 
-用 `shasum -a 256 <安装包>` 或 `sha256sum <安装包>` 与校验文件中的对应行比较，解压后在安装包目录执行：
+Windows 在文件名末尾增加 `.exe`。同时下载 `SHA256SUMS`，用 `shasum -a 256`、`sha256sum` 或 PowerShell `Get-FileHash -Algorithm SHA256` 核对相应文件。
 
-```bash
-bash install.sh
-export PATH="$HOME/.local/bin:$PATH"
-apimoon version
-testmoon-runner --version
-```
+macOS/Linux 校验后，用 `install -m 755` 将两文件安装到 `~/.local/bin/apimoon`、`~/.local/bin/testmoon-runner`，将该目录加入 PATH。Windows 重命名为 `apimoon.exe`、`testmoon-runner.exe` 并加入 PATH。分别执行 `apimoon version`、`testmoon-runner --version` 确认程序可用；直接运行 Runner 前先准备下述参数。
 
-默认安装两个程序到 `~/.local/bin`。自定义目录用 `bash install.sh /自定义/bin`，将其加入终端和 Agent 进程的 PATH。安装和升级保留 `~/.api_moon/` 的配置、同步记录与 Runner 状态；升级 Runner 前等待当前任务结束并停止旧进程。
+Skill 已内嵌在 APIMoon 中，无需安装脚本或源码。Worker 从 Docker Hub 拉取，用户无需 Git、Go、Node。没有已发布附件时说明发布未完成，不要把示例版本视为可下载版本。
 
-APIMoon 已内嵌 Skill，安装包包含 `build-worker.sh`、`VERSION`、`COMMIT` 和 `REPOSITORY`。保留解压目录，用于构建 Worker。没有已发布附件时，说明发布尚未完成，不要把维护者示例版本视为可下载的正式版本。
-
-维护者可从 TestMoon 源码运行 `make release-apimoon APIMOON_VERSION=vX.Y.Z` 打包；这一步需要 Go，仅用于维护者构建，不是使用者的安装步骤。
+升级保留 `~/.api_moon/` 配置、同步记录和 Runner 状态，先等待任务结束并停止旧 Runner。
 
 ## 连接 TestMoon
 
@@ -40,34 +34,43 @@ apimoon config set context.environment_id <环境ID>
 
 配置已存在时先用 `config show` 查看脱敏内容，保留用户已有的服务地址和作用域。更换组织会清除项目、环境及 Runner；更换项目会清除环境及 Runner。环境可由计划创建，也可引用已有环境。
 
-`auth login` 从 stdin 读取至 EOF；交互输入后按 Ctrl+D，自动化调用通过子进程 stdin 提供用户给定的密码。登录会话过期后重新登录。
-
-## 本地构建 Worker
-
-前置条件：本机 Docker 已启动。安装包解压目录中执行：
+`auth login` 从 stdin 读取至 EOF，自动化调用通过子进程 stdin 提供用户给定的密码。Mac 默认 zsh 隐藏输入密码：
 
 ```bash
-bash build-worker.sh
+read -r -s 'APIMOON_PASSWORD?TestMoon 登录密码：'
+echo
+printf '%s' "$APIMOON_PASSWORD" | apimoon auth login --username '你的用户名' --password-stdin
+unset APIMOON_PASSWORD
 ```
 
-脚本用 curl 下载本发布包 `COMMIT` 指定的源码，通过 Dockerfile 在容器内完成 Go/Node 构建，生成 `testmoon/worker:<发布版本，去掉v前缀>`。宿主机需要 Docker、curl、tar、Bash，无需 Go、Node、Make；构建会获取基础镜像和依赖。
+Windows PowerShell：
 
-已有对应源码或私有仓库时，可以传入干净的 Git checkout：
+```powershell
+$password = Read-Host 'TestMoon 登录密码' -AsSecureString
+$OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+[System.Net.NetworkCredential]::new('', $password).Password | apimoon auth login --username '你的用户名' --password-stdin
+Remove-Variable password
+```
+
+登录会话过期后重新登录。默认配置保存在 `~/.api_moon/config.yaml`，登录凭证由 CLI 写入，不要手工填写；平台账号密码与 Runner 的一次性注册凭证用途不同。
+
+## 拉取 Worker
+
+前置条件：Docker 已安装并启动；Windows Docker Desktop 使用 Linux 容器模式。
 
 ```bash
-bash build-worker.sh /本地/TestMoon
+docker pull flyingcode/testmoon-worker:0.1.0
 ```
 
-此模式需要 Git，脚本会验证 HEAD 与安装包 `COMMIT` 一致且无本地修改。需要修改镜像标签时，在构建和启动 Runner 时使用相同的 `TESTMOON_WORKER_IMAGE`。
+Mac、Linux 和 PowerShell 使用相同命令，Docker 自动选择匹配架构。Worker 镜像版本与 APIMoon/Runner 的 Release 版本分别管理；当前使用 `0.1.0`，不能按 CLI 版本拼接镜像标签。当前 Runner 默认地址仍为 `testmoon/worker:0.1.0`，必须显式配置下面的 Docker Hub 地址。
 
 ## 启动本机私有 Runner
 
-用户在 TestMoon 所选项目的「Runner 管理」创建私有节点并获得一次性注册凭证后，在安装包解压目录的独立 Bash 终端中启动已安装的 Runner：
+用户在 TestMoon 所选项目的「Runner 管理」创建私有节点并获得一次性注册凭证后，在独立 Bash 终端中启动从 Release 下载的 Runner：
 
 ```bash
-release_version="$(cat VERSION)"
 export TESTMOON_URL='https://testmoon.example.com'
-export TESTMOON_WORKER_IMAGE="testmoon/worker:${release_version#v}"
+export TESTMOON_WORKER_IMAGE='flyingcode/testmoon-worker:0.1.0'
 export TESTMOON_RUNNER_STATE="$HOME/.api_moon/runner/state.json"
 export DOCKER_HOST="${DOCKER_HOST:-$(docker context inspect --format '{{.Endpoints.docker.Host}}')}"
 docker info >/dev/null
@@ -79,6 +82,8 @@ echo
 export TESTMOON_ENROLLMENT_TOKEN
 testmoon-runner
 ```
+
+PowerShell 启动使用 `$env:变量名 = 值`，Docker 地址同样从 `docker context inspect` 获取；凭证通过 `Read-Host -AsSecureString` 读取。Mac 默认 zsh 使用 `read -r -s 'TESTMOON_ENROLLMENT_TOKEN?Runner 注册凭证：'` 替代 Bash 的 `read -p`。
 
 注册状态创建后，后续启动保持相同平台地址、状态文件和 Worker 镜像，无需再次输入注册凭证。运行凭证独立于 CLI 登录会话；不要展示状态文件内容。
 
