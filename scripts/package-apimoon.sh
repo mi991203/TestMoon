@@ -9,8 +9,6 @@ mkdir -p "$output"
 output="$(cd "$output" && pwd)"
 [[ ! -e "$output/SHA256SUMS" ]] || { echo 'Output directory already contains a release; choose a new directory.' >&2; exit 1; }
 commit="$(git rev-parse HEAD)"
-repository="${GITHUB_REPOSITORY:-mi991203/TestMoon}"
-[[ "$repository" =~ ^[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+$ ]] || { echo 'Invalid source repository' >&2; exit 1; }
 date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 metadata=github.com/mi991203/TestMoon/libs/go/buildinfo
 flags="-s -w -X $metadata.Version=$version -X $metadata.Commit=$commit -X $metadata.Date=$date"
@@ -24,32 +22,19 @@ assets=()
 for target in $targets; do
   goos="${target%/*}"
   goarch="${target#*/}"
-  name="apimoon_${version}_${goos}_${goarch}"
-  if [[ "$goos" == windows ]]; then
-    runner_name="testmoon-runner_${version}_${goos}_${goarch}.exe"
-    [[ ! -e "$output/$name.exe" && ! -e "$output/$runner_name" ]] || { echo "Windows executable already exists for $target; choose a new directory." >&2; exit 1; }
-    echo "Building APIMoon and Runner for $target"
-    CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" "${GO:-go}" build -trimpath -ldflags "$flags" -o "$temporary/$name.exe" ./tools/apimoon/cmd
-    CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" "${GO:-go}" build -trimpath -ldflags "$flags" -o "$temporary/$runner_name" ./backend/testing/runner/cmd/runner
-    mv "$temporary/$name.exe" "$temporary/$runner_name" "$output/"
-    assets+=("$name.exe" "$runner_name")
-    continue
-  fi
-  archive="$output/$name.tar.gz"
-  [[ ! -e "$archive" ]] || { echo "Archive already exists: $archive" >&2; exit 1; }
-  package="$temporary/$name"
-  mkdir -p "$package"
+  extension=""
+  if [[ "$goos" == windows ]]; then extension=.exe; fi
+  name="apimoon_${version}_${goos}_${goarch}${extension}"
+  runner_name="testmoon-runner_${version}_${goos}_${goarch}${extension}"
+  [[ ! -e "$output/$name" && ! -e "$output/$runner_name" ]] || { echo "Executable already exists for $target; choose a new directory." >&2; exit 1; }
   echo "Building APIMoon and Runner for $target"
-  CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" "${GO:-go}" build -trimpath -ldflags "$flags" -o "$package/apimoon" ./tools/apimoon/cmd
-  CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" "${GO:-go}" build -trimpath -ldflags "$flags" -o "$package/testmoon-runner" ./backend/testing/runner/cmd/runner
-  cp tools/apimoon/distribution/install.sh tools/apimoon/distribution/build-worker.sh tools/apimoon/distribution/README.md "$package/"
-  printf '%s\n' "$version" > "$package/VERSION"
-  printf '%s\n' "$commit" > "$package/COMMIT"
-  printf '%s\n' "$repository" > "$package/REPOSITORY"
-  chmod 755 "$package/apimoon" "$package/testmoon-runner" "$package/install.sh" "$package/build-worker.sh"
-  COPYFILE_DISABLE=1 tar -czf "$archive" -C "$temporary" "$name"
-  assets+=("$name.tar.gz")
+  CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" "${GO:-go}" build -trimpath -ldflags "$flags" -o "$temporary/$name" ./tools/apimoon/cmd
+  CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" "${GO:-go}" build -trimpath -ldflags "$flags" -o "$temporary/$runner_name" ./backend/testing/runner/cmd/runner
+  chmod 755 "$temporary/$name" "$temporary/$runner_name"
+  mv "$temporary/$name" "$temporary/$runner_name" "$output/"
+  assets+=("$name" "$runner_name")
 done
+[[ ${#assets[@]} -gt 0 ]] || { echo 'No release targets selected.' >&2; exit 2; }
 (
   cd "$output"
   if command -v sha256sum >/dev/null; then

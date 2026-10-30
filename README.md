@@ -91,28 +91,13 @@ make typecheck
 make build-all
 ```
 
-## 远程 Runner
+## 本机与远程 Runner
 
-执行机器需要 Docker 和平台 HTTPS 地址。公共节点在管理员门户创建，私有节点在项目「Runner 管理」创建并生成凭证。
+执行机器需要 Docker 和平台 HTTPS 地址。APIMoon、Runner 直接从 [GitHub Releases](https://github.com/mi991203/TestMoon/releases) 下载对应系统/架构的独立可执行文件，加入 PATH；用户无需构建 Runner 或安装 Go。仅 Worker 镜像通过同版本源码的 `deploy/runner/worker.Dockerfile` 在本地 Docker 中构建。
 
-在仓库中构建镜像，将两个镜像及 `deploy/runner/compose.yaml` 分发到执行机器：
+私有节点在项目「Runner 管理」创建并生成一次性注册凭证，公共节点由管理员创建。准备平台地址、Worker 镜像名、可写的状态文件路径、Docker 连接地址及首次注册凭证，然后启动已下载的 `testmoon-runner`。安装和启动命令见 [Runner 接入说明](tools/apimoon/distribution/README.md)。
 
-```bash
-make runner-image worker-image
-```
-
-在执行机器启动（按实际位置调整 Compose 文件路径）：
-
-```bash
-export TESTMOON_URL=https://testmoon.example.com
-export TESTMOON_ENROLLMENT_TOKEN='<一次性注册凭证>'
-docker compose -f deploy/runner/compose.yaml up -d
-unset TESTMOON_ENROLLMENT_TOKEN
-```
-
-注册状态保存在 `runner-state` 卷，后续无需凭证。Runner 需要 Docker API 权限，应使用专用执行机器；每次执行使用独立 Worker 容器。私有节点仅服务所属项目，可访问部署网络；公共节点仅能访问公网。
-
-容器中的 `localhost` 指 Runner 容器。本机 Runner 使用宿主机网络，不使用系统 HTTP 代理；VPN 需提供可用的 DNS 和直连路由。
+保留 Runner 状态文件，后续无需重复注册。Runner 使用所在机器的网络，可访问本地或部署网络；不使用系统 HTTP 代理，VPN 需提供可用的 DNS 和直连路由。
 
 ## Mock 与文档分享
 

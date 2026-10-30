@@ -4,24 +4,18 @@
 
 ## 安装预编译 APIMoon 和 Runner
 
-普通使用者无需 Go 或 Node。从 [GitHub Releases](https://github.com/mi991203/TestMoon/releases) 选择与平台兼容的 `apimoon-vX.Y.Z`。支持 macOS、Linux、Windows 的 amd64、arm64。macOS/Linux 下载 `apimoon_vX.Y.Z_<系统>_<架构>.tar.gz` 和 `SHA256SUMS`；Windows 下载同架构的 `apimoon_vX.Y.Z_windows_<架构>.exe`、`testmoon-runner_vX.Y.Z_windows_<架构>.exe` 和 `SHA256SUMS`，无需解压。
+APIMoon 和 Runner 均由维护者在 GitHub Actions 编译，用户从 [GitHub Releases](https://github.com/mi991203/TestMoon/releases) 分别下载，不自行构建。支持 macOS、Linux、Windows 的 amd64、arm64，全部为独立可执行文件，无压缩包：
 
-Windows 在 PowerShell 用 `Get-FileHash <文件> -Algorithm SHA256` 与 `SHA256SUMS` 比较；校验后重命名为 `apimoon.exe`、`testmoon-runner.exe`，将所在目录加入 PATH。CLI 命令相同。Worker 使用 Docker Desktop 的 Linux 容器，从同一发布标签源码的 `deploy/runner/worker.Dockerfile` 本地构建。具体 PowerShell 步骤见仓库 `tools/apimoon/distribution/README.md` 的 Windows 章节；下文解压、Bash 安装及 Runner 启动步骤适用于 macOS/Linux。
+- `apimoon_vX.Y.Z_<系统>_<架构>`
+- `testmoon-runner_vX.Y.Z_<系统>_<架构>`
 
-用 `shasum -a 256 <安装包>` 或 `sha256sum <安装包>` 与校验文件中的对应行比较，解压后在安装包目录执行：
+Windows 在文件名末尾增加 `.exe`。同时下载 `SHA256SUMS`，用 `shasum -a 256`、`sha256sum` 或 PowerShell `Get-FileHash -Algorithm SHA256` 核对相应文件。
 
-```bash
-bash install.sh
-export PATH="$HOME/.local/bin:$PATH"
-apimoon version
-testmoon-runner --version
-```
+macOS/Linux 校验后，用 `install -m 755` 将两文件安装到 `~/.local/bin/apimoon`、`~/.local/bin/testmoon-runner`，将该目录加入 PATH。Windows 重命名为 `apimoon.exe`、`testmoon-runner.exe` 并加入 PATH。分别执行 `apimoon version`、`testmoon-runner --version` 确认程序可用；直接运行 Runner 前先准备下述参数。
 
-默认安装两个程序到 `~/.local/bin`。自定义目录用 `bash install.sh /自定义/bin`，将其加入终端和 Agent 进程的 PATH。安装和升级保留 `~/.api_moon/` 的配置、同步记录与 Runner 状态；升级 Runner 前等待当前任务结束并停止旧进程。
+Skill 已内嵌在 APIMoon 中，无需安装脚本或源码。只有 Worker 使用 Git 获取同一发布标签的源码并通过 Docker 构建，不在宿主机编译 Go。没有已发布附件时说明发布未完成，不要把示例版本视为可下载版本。
 
-APIMoon 已内嵌 Skill，安装包包含 `build-worker.sh`、`VERSION`、`COMMIT` 和 `REPOSITORY`。保留解压目录，用于构建 Worker。没有已发布附件时，说明发布尚未完成，不要把维护者示例版本视为可下载的正式版本。
-
-维护者可从 TestMoon 源码运行 `make release-apimoon APIMOON_VERSION=vX.Y.Z` 打包；这一步需要 Go，仅用于维护者构建，不是使用者的安装步骤。
+升级保留 `~/.api_moon/` 配置、同步记录和 Runner 状态，先等待任务结束并停止旧 Runner。
 
 ## 连接 TestMoon
 
@@ -44,30 +38,22 @@ apimoon config set context.environment_id <环境ID>
 
 ## 本地构建 Worker
 
-前置条件：本机 Docker 已启动。安装包解压目录中执行：
+前置条件：Git、Docker 已安装并启动；Windows Docker Desktop 使用 Linux 容器模式。只构建 Worker，版本替换为已下载的 Runner 版本：
 
 ```bash
-bash build-worker.sh
+git clone --branch apimoon-v0.1.3 --depth 1 https://github.com/mi991203/TestMoon.git TestMoon-v0.1.3
+docker build -f TestMoon-v0.1.3/deploy/runner/worker.Dockerfile -t testmoon/worker:0.1.3 TestMoon-v0.1.3
 ```
 
-脚本用 curl 下载本发布包 `COMMIT` 指定的源码，通过 Dockerfile 在容器内完成 Go/Node 构建，生成 `testmoon/worker:<发布版本，去掉v前缀>`。宿主机需要 Docker、curl、tar、Bash，无需 Go、Node、Make；构建会获取基础镜像和依赖。
-
-已有对应源码或私有仓库时，可以传入干净的 Git checkout：
-
-```bash
-bash build-worker.sh /本地/TestMoon
-```
-
-此模式需要 Git，脚本会验证 HEAD 与安装包 `COMMIT` 一致且无本地修改。需要修改镜像标签时，在构建和启动 Runner 时使用相同的 `TESTMOON_WORKER_IMAGE`。
+上面使用正斜杠路径，在 Bash 和 PowerShell 均可执行。Go/Node 构建发生在容器内，用户无需安装这些工具。启动 Runner 时使用相同的 `TESTMOON_WORKER_IMAGE`。
 
 ## 启动本机私有 Runner
 
-用户在 TestMoon 所选项目的「Runner 管理」创建私有节点并获得一次性注册凭证后，在安装包解压目录的独立 Bash 终端中启动已安装的 Runner：
+用户在 TestMoon 所选项目的「Runner 管理」创建私有节点并获得一次性注册凭证后，在独立 Bash 终端中启动从 Release 下载的 Runner：
 
 ```bash
-release_version="$(cat VERSION)"
 export TESTMOON_URL='https://testmoon.example.com'
-export TESTMOON_WORKER_IMAGE="testmoon/worker:${release_version#v}"
+export TESTMOON_WORKER_IMAGE='testmoon/worker:0.1.3'
 export TESTMOON_RUNNER_STATE="$HOME/.api_moon/runner/state.json"
 export DOCKER_HOST="${DOCKER_HOST:-$(docker context inspect --format '{{.Endpoints.docker.Host}}')}"
 docker info >/dev/null
@@ -79,6 +65,8 @@ echo
 export TESTMOON_ENROLLMENT_TOKEN
 testmoon-runner
 ```
+
+PowerShell 启动使用 `$env:变量名 = 值`，Docker 地址同样从 `docker context inspect` 获取；凭证通过 `Read-Host -AsSecureString` 读取。Mac 默认 zsh 使用 `read -r -s 'TESTMOON_ENROLLMENT_TOKEN?Runner 注册凭证：'` 替代 Bash 的 `read -p`。
 
 注册状态创建后，后续启动保持相同平台地址、状态文件和 Worker 镜像，无需再次输入注册凭证。运行凭证独立于 CLI 登录会话；不要展示状态文件内容。
 
